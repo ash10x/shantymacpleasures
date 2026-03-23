@@ -17,6 +17,7 @@ type CartContextType = {
   increaseQty: (id: number) => void;
   decreaseQty: (id: number) => void;
   total: number;
+  clearCart: () => void; // ✅ added
 };
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -62,6 +63,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
+  const clearCart = () => {
+    setCart([]);
+  };
+
   const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   return (
@@ -73,6 +78,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         increaseQty,
         decreaseQty,
         total,
+        clearCart, // ✅ added
       }}
     >
       {children}
