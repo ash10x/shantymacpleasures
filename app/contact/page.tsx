@@ -19,16 +19,16 @@ export default function ContactPage() {
     setSubmitted(true);
     setForm({ name: "", email: "", message: "" });
 
-    // Optional: auto reset message after a few seconds
     setTimeout(() => setSubmitted(false), 4000);
   };
 
   return (
     <div className="min-h-screen bg-white py-36 px-6 relative overflow-hidden">
-      {/* 🌫 Premium background glow */}
-      <div className="absolute inset-0 bg-gradient-to-br from-pink-100/40 via-purple-100/30 to-white blur-3xl" />
+      {/* 🌫 PREMIUM BACKGROUND (REFINED) */}
+      <div className="absolute inset-0 bg-gradient-to-br from-pink-100/30 via-purple-100/20 to-white blur-3xl" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
 
-      {/* Floating glow elements */}
+      {/* Floating glow */}
       <motion.div
         className="absolute top-10 left-1/4 w-72 h-72 bg-pink-200/30 rounded-full blur-3xl"
         animate={{ y: [0, 20, 0] }}
@@ -42,12 +42,18 @@ export default function ContactPage() {
 
       {/* TITLE */}
       <motion.h1
-        className="text-4xl md:text-5xl font-semibold text-center mb-12 relative z-10 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent"
+        className="text-4xl md:text-5xl font-semibold text-center mb-4 relative z-10 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent tracking-tight"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
         Let’s Talk
       </motion.h1>
+
+      {/* SUBTEXT (NEW - improves conversion) */}
+      <p className="text-center text-black/60 mb-12 max-w-xl mx-auto relative z-10">
+        Questions, custom orders, or need guidance? Reach out anytime — we
+        respond fast and discreetly.
+      </p>
 
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 relative z-10">
         {/* INFO */}
@@ -59,11 +65,11 @@ export default function ContactPage() {
           <h2 className="text-2xl font-semibold">Contact Information</h2>
 
           <p className="text-black/60 leading-relaxed">
-            Questions, custom orders, or just curious? We’re here to help—
-            discreetly and professionally.
+            We value your privacy and discretion. Every message is handled with
+            care and professionalism.
           </p>
 
-          <div className="space-y-2 text-sm">
+          <div className="space-y-3 text-sm">
             <p>
               <span className="font-medium">Email:</span>{" "}
               shantymacpleasures@yahoo.com
@@ -75,6 +81,11 @@ export default function ContactPage() {
               <span className="font-medium">Location:</span> Montego Bay,
               Jamaica
             </p>
+          </div>
+
+          {/* 💎 TRUST BADGE (NEW) */}
+          <div className="mt-6 text-xs text-black/50">
+            🔒 100% discreet • ⚡ Fast response • 💬 Friendly support
           </div>
         </motion.div>
 
@@ -91,9 +102,14 @@ export default function ContactPage() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
-                className="text-center text-pink-500 font-semibold text-lg"
+                className="text-center"
               >
-                ✨ Message sent successfully
+                <p className="text-green-500 text-lg font-semibold">
+                  ✓ Message sent successfully
+                </p>
+                <p className="text-sm text-black/60 mt-2">
+                  We’ll get back to you shortly.
+                </p>
               </motion.div>
             ) : (
               <motion.form
@@ -139,7 +155,7 @@ export default function ContactPage() {
                   />
                 </div>
 
-                {/* 💎 PREMIUM BUTTON */}
+                {/* 💎 PREMIUM CTA */}
                 <motion.button
                   whileTap={{ scale: 0.96 }}
                   whileHover={{ scale: 1.03 }}
