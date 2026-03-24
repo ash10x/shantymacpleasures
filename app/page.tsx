@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { useCart } from "@/app/context/cartContext";
 import { useState } from "react";
 
@@ -29,6 +30,36 @@ const products = [
   },
 ];
 
+/* ================= FEATURED ================= */
+const featured = [
+  {
+    id: 10,
+    name: "Luxury Glass Dildo",
+    price: 59,
+    image: "/products/glass.jpg",
+  },
+  {
+    id: 11,
+    name: "Rechargeable Bullet",
+    price: 19,
+    image: "/products/bullet.jpg",
+  },
+];
+
+/* ================= COMING SOON ================= */
+const comingSoon = [
+  {
+    id: 201,
+    name: "Smart App-Control Vibrator",
+    image: "/products/rose1.jpg",
+  },
+  {
+    id: 202,
+    name: "Luxury Couple Sync Set",
+    image: "/products/vibrator.jpg",
+  },
+];
+
 /* ================= BUNDLES ================= */
 const bundles = [
   {
@@ -47,15 +78,12 @@ const bundles = [
 
 export default function HomePage() {
   const { addToCart } = useCart();
-
   const [addedId, setAddedId] = useState<number | null>(null);
 
   const handleAdd = (item: any) => {
     addToCart(item);
     setAddedId(item.id);
-
     window.dispatchEvent(new Event("open-cart"));
-
     setTimeout(() => setAddedId(null), 1500);
   };
 
@@ -63,31 +91,32 @@ export default function HomePage() {
     <main className="bg-white text-black overflow-hidden">
       {/* ================= HERO ================= */}
       <section className="min-h-screen flex flex-col justify-center items-center text-center px-6 relative overflow-hidden">
-        {/* 🔥 Background Image (animated) */}
+        {/* Background */}
         <motion.div
           className="absolute inset-0"
           animate={{ scale: [1.05, 1.1, 1.05] }}
           transition={{ duration: 20, repeat: Infinity }}
         >
-          <img
+          <Image
             src="/images/bg1.jpg"
-            className="w-full h-full object-cover"
             alt="Luxury background"
+            fill
+            className="object-cover"
+            priority
           />
         </motion.div>
 
-        {/* 🎨 Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/60 via-pink-100/50 to-purple-100/50" />
+        {/* Premium overlays */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-pink-100/30 to-purple-100/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-br from-pink-200/20 via-purple-200/20 blur-3xl" />
 
-        {/* ✨ Glow */}
-        <div className="absolute inset-0 bg-gradient-to-br from-pink-200/20 via-purple-200/20 to-transparent blur-3xl" />
-
-        {/* CONTENT */}
-        <div className="relative z-10 flex flex-col items-center max-w-3xl">
+        {/* Content */}
+        <div className="relative z-10 max-w-3xl">
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-6xl font-semibold max-w-3xl leading-tight"
+            className="text-4xl md:text-6xl font-semibold leading-[1.1] tracking-tight"
           >
             Your Pleasure Is
             <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
@@ -96,23 +125,46 @@ export default function HomePage() {
             </span>
           </motion.h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="mt-6 text-black/70 max-w-xl text-sm md:text-base leading-relaxed"
-          >
+          <p className="mt-6 text-black/70 max-w-xl mx-auto">
             Discover a curated collection of intimate products designed to
             elevate your experience with elegance and discretion.
-          </motion.p>
+          </p>
 
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Link href="/shop">
-              <button className="mt-8 bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-pink-200 transition">
-                Explore Collection
-              </button>
-            </Link>
-          </motion.div>
+          <Link href="/shop">
+            <button className="mt-8 bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-pink-200 transition">
+              Explore Collection
+            </button>
+          </Link>
+
+          <p className="mt-4 text-xs text-black/50">
+            ⭐ Trusted by 1,000+ customers
+          </p>
+        </div>
+      </section>
+
+      {/* ================= FEATURED ================= */}
+      <section className="py-20 px-6 max-w-6xl mx-auto">
+        <h2 className="text-2xl md:text-3xl font-semibold mb-10">
+          Featured Products
+        </h2>
+
+        <div className="grid md:grid-cols-2 gap-10">
+          {featured.map((item) => (
+            <div
+              key={item.id}
+              className="bg-white p-4 rounded-2xl border shadow-sm hover:shadow-lg transition"
+            >
+              <Image
+                src={item.image}
+                alt={item.name}
+                width={400}
+                height={300}
+                className="rounded-xl object-cover"
+              />
+              <h3 className="mt-4 font-semibold">{item.name}</h3>
+              <p className="text-black/60">${item.price}</p>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -127,17 +179,14 @@ export default function HomePage() {
             <motion.div
               key={product.id}
               whileHover={{ y: -8 }}
-              className="group relative bg-white border border-black/10 rounded-2xl p-4 shadow-sm hover:shadow-xl transition"
+              className="group relative bg-white border rounded-2xl p-4 shadow-sm hover:shadow-xl transition"
             >
-              {product.badge && (
-                <span className="absolute top-3 left-3 bg-pink-500 text-white text-xs px-2 py-1 rounded-full z-20">
-                  {product.badge}
-                </span>
-              )}
-
               <div className="overflow-hidden rounded-xl">
-                <img
+                <Image
                   src={product.image}
+                  alt={product.name}
+                  width={400}
+                  height={300}
                   className="w-full h-52 object-cover group-hover:scale-105 transition duration-500"
                 />
               </div>
@@ -147,21 +196,7 @@ export default function HomePage() {
 
               <motion.button
                 whileTap={{ scale: 0.95 }}
-                whileHover={{ scale: 1.03 }}
-                animate={
-                  product.id === 1
-                    ? {
-                        boxShadow: [
-                          "0 0 0px rgba(236,72,153,0)",
-                          "0 0 12px rgba(236,72,153,0.35)",
-                          "0 0 0px rgba(236,72,153,0)",
-                        ],
-                      }
-                    : {}
-                }
-                transition={
-                  product.id === 1 ? { repeat: Infinity, duration: 2 } : {}
-                }
+                animate={addedId === product.id ? { scale: [1, 1.1, 1] } : {}}
                 onClick={() =>
                   handleAdd({
                     id: product.id,
@@ -170,10 +205,10 @@ export default function HomePage() {
                     image: product.image,
                   })
                 }
-                className={`mt-4 w-full py-2 rounded-lg shadow-md transition ${
+                className={`mt-4 w-full py-2 rounded-lg ${
                   addedId === product.id
                     ? "bg-green-500 text-white"
-                    : "bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:shadow-pink-200/40"
+                    : "bg-gradient-to-r from-pink-500 to-purple-600 text-white"
                 }`}
               >
                 {addedId === product.id ? "Added ✓" : "Add to Cart"}
@@ -183,65 +218,49 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ================= BUNDLES ================= */}
-      <section className="py-24 px-6 bg-gradient-to-r from-pink-50 to-purple-50">
-        <h2 className="text-2xl md:text-3xl font-semibold text-center mb-14">
-          Curated Bundles
+      {/* ================= COMING SOON ================= */}
+      <section className="py-24 px-6 bg-linear-to-r from-pink-500 to-purple-600 text-white">
+        <h2 className="text-4xl md:text-4xl font-bold text-center mb-12">
+          Coming Soon
         </h2>
 
-        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-10">
-          {bundles.map((bundle) => (
-            <motion.div
-              key={bundle.id}
-              whileHover={{ scale: 1.04 }}
-              className="p-8 bg-white rounded-2xl border border-black/10 shadow-sm hover:shadow-xl transition"
-            >
-              <h3 className="text-lg font-semibold">{bundle.name}</h3>
-              <p className="text-black/60 text-sm mt-2">{bundle.desc}</p>
+        <div className="grid md:grid-cols-2 gap-10 max-w-5xl mx-auto">
+          {comingSoon.map((item) => (
+            <div key={item.id} className="relative group">
+              <Image
+                src={item.image}
+                alt={item.name}
+                width={500}
+                height={350}
+                className="rounded-2xl object-cover opacity-80 group-hover:opacity-100 transition"
+              />
 
-              <p className="mt-4 font-semibold text-xl">${bundle.price}</p>
+              {/* Overlay badge */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="bg-white text-black px-4 py-2 rounded-full text-sm shadow-md">
+                  Coming Soon
+                </span>
+              </div>
 
-              <button
-                onClick={() =>
-                  handleAdd({
-                    id: bundle.id,
-                    name: bundle.name,
-                    price: bundle.price,
-                    image: "/images/bundle.jpg",
-                  })
-                }
-                className="mt-6 w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 rounded-lg shadow-md hover:shadow-pink-200 transition"
-              >
-                Get Bundle
-              </button>
-            </motion.div>
+              <p className="mt-4 font-semibold text-2xl text-center text-white/90">
+                {item.name}
+              </p>
+            </div>
           ))}
-        </div>
-      </section>
-
-      {/* ================= TRUST ================= */}
-      <section className="py-20 text-center px-6">
-        <div className="flex flex-wrap justify-center gap-8 text-sm text-black/60">
-          <span>🔒 Discreet Packaging</span>
-          <span>🚚 Fast Delivery</span>
-          <span>💳 Secure Checkout</span>
-          <span>✔ Body-Safe Materials</span>
         </div>
       </section>
 
       {/* ================= CTA ================= */}
       <section className="py-24 text-center px-6">
-        <h2 className="text-3xl md:text-5xl font-semibold leading-tight">
+        <h2 className="text-3xl md:text-5xl font-semibold">
           Discover What You’ve Been Missing
         </h2>
 
-        <motion.div whileHover={{ scale: 1.05 }}>
-          <Link href="/shop">
-            <button className="mt-10 bg-gradient-to-r from-pink-500 to-purple-600 text-white px-10 py-4 rounded-full shadow-lg hover:shadow-pink-200 transition">
-              Start Exploring
-            </button>
-          </Link>
-        </motion.div>
+        <Link href="/shop">
+          <button className="mt-10 bg-gradient-to-r from-pink-500 to-purple-600 text-white px-10 py-4 rounded-full shadow-lg">
+            Start Exploring
+          </button>
+        </Link>
       </section>
     </main>
   );
