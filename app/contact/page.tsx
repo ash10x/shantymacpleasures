@@ -1,11 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+
+type SubmitState = "idle" | "loading" | "success" | "error";
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState<SubmitState>("idle");
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    nameInputRef.current?.focus();
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -13,66 +20,91 @@ export default function ContactPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitted("loading");
 
-    setSubmitted(true);
-    setForm({ name: "", email: "", message: "" });
+    try {
+      const res = await fetch("/server/actions/addMessage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
-    setTimeout(() => setSubmitted(false), 4000);
+      const data = await res.json();
+
+      if (res.ok) {
+        setSubmitted("success");
+        setForm({ name: "", email: "", message: "" });
+      } else {
+        setSubmitted("error");
+        console.error(data.message);
+      }
+    } catch (err) {
+      setSubmitted("error");
+      console.error(err);
+    }
+
+    setTimeout(() => setSubmitted("idle"), 4000);
   };
 
   return (
-    <div className="min-h-screen bg-white py-36 px-6 relative overflow-hidden">
-      {/* 🌫 PREMIUM BACKGROUND (REFINED) */}
-      <div className="absolute inset-0 bg-gradient-to-br from-pink-100/30 via-purple-100/20 to-white blur-3xl" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
-
-      {/* Floating glow */}
+    <div className="relative min-h-screen py-36 px-6 overflow-hidden bg-white">
+      {/* ================= AMBIENT BACKGROUND ================= */}
       <motion.div
-        className="absolute top-10 left-1/4 w-72 h-72 bg-pink-200/30 rounded-full blur-3xl"
-        animate={{ y: [0, 20, 0] }}
-        transition={{ duration: 6, repeat: Infinity }}
+        animate={{ y: [0, -40, 0], x: [0, 30, 0] }}
+        transition={{ duration: 12, repeat: Infinity }}
+        className="absolute w-[30rem] h-[30rem] bg-pink-500/20 blur-[120px] rounded-full top-10 left-[-10rem]"
       />
       <motion.div
-        className="absolute bottom-20 right-1/4 w-64 h-64 bg-purple-200/30 rounded-full blur-3xl"
-        animate={{ y: [0, -20, 0] }}
-        transition={{ duration: 5, repeat: Infinity }}
+        animate={{ y: [0, 50, 0], x: [0, -30, 0] }}
+        transition={{ duration: 14, repeat: Infinity }}
+        className="absolute w-[30rem] h-[30rem] bg-purple-500/20 blur-[120px] rounded-full bottom-0 right-[-10rem]"
       />
 
-      {/* TITLE */}
-      <motion.h1
-        className="text-4xl md:text-5xl font-semibold text-center mb-4 relative z-10 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent tracking-tight"
-        initial={{ opacity: 0, y: -20 }}
+      <div className="absolute inset-0 bg-gradient-to-br from-white via-pink-50/40 to-white" />
+
+      {/* ================= HEADER ================= */}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="text-center mb-16 relative z-10"
       >
-        Let’s Talk
-      </motion.h1>
+        <h1 className="text-4xl md:text-5xl font-semibold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+          Let’s Talk
+        </h1>
+        <p className="text-black/60 mt-3 max-w-xl mx-auto">
+          Questions, custom orders, or need guidance? Reach out anytime — we
+          respond fast and discreetly.
+        </p>
+      </motion.div>
 
-      {/* SUBTEXT (NEW - improves conversion) */}
-      <p className="text-center text-black/60 mb-12 max-w-xl mx-auto relative z-10">
-        Questions, custom orders, or need guidance? Reach out anytime — we
-        respond fast and discreetly.
-      </p>
-
-      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 relative z-10">
-        {/* INFO */}
+      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-14 relative z-10">
+        {/* ================= INFO ================= */}
         <motion.div
-          className="space-y-6 text-gray-800"
           initial={{ opacity: 0, x: -40 }}
           animate={{ opacity: 1, x: 0 }}
+          className="space-y-6"
         >
-          <h2 className="text-2xl font-semibold">Contact Information</h2>
+          <h2 className="text-2xl font-semibold text-gray-800">
+            Contact Information
+          </h2>
 
           <p className="text-black/60 leading-relaxed">
             We value your privacy and discretion. Every message is handled with
             care and professionalism.
           </p>
 
-          <div className="space-y-3 text-sm">
+          <div className="space-y-3 text-sm text-gray-700">
             <p>
               <span className="font-medium">Email:</span>{" "}
-              shantymacpleasures@yahoo.com
+              <a
+                href="mailto:shantymacpleasures@yahoo.com"
+                className="underline hover:text-pink-600 transition"
+              >
+                shantymacpleasures@yahoo.com
+              </a>
             </p>
             <p>
               <span className="font-medium">Phone:</span> +1 876 312 1862
@@ -83,20 +115,21 @@ export default function ContactPage() {
             </p>
           </div>
 
-          {/* 💎 TRUST BADGE (NEW) */}
-          <div className="mt-6 text-xs text-black/50">
+          {/* TRUST */}
+          <div className="pt-6 text-sm text-black/50">
             🔒 100% discreet • ⚡ Fast response • 💬 Friendly support
           </div>
         </motion.div>
 
-        {/* FORM */}
+        {/* ================= FORM ================= */}
         <motion.div
-          className="backdrop-blur-xl bg-white/70 rounded-3xl shadow-xl p-8 border border-black/10"
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
+          className="relative backdrop-blur-xl bg-white/70 rounded-3xl shadow-xl p-8 border border-black/10"
         >
           <AnimatePresence mode="wait">
-            {submitted ? (
+            {/* SUCCESS */}
+            {submitted === "success" && (
               <motion.div
                 key="success"
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -111,37 +144,58 @@ export default function ContactPage() {
                   We’ll get back to you shortly.
                 </p>
               </motion.div>
-            ) : (
+            )}
+
+            {/* ERROR */}
+            {submitted === "error" && (
+              <motion.div
+                key="error"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                className="text-center text-red-500"
+              >
+                ⚠️ Failed to send message. Please try again.
+              </motion.div>
+            )}
+
+            {/* LOADING */}
+            {submitted === "loading" && (
+              <motion.div
+                key="loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex justify-center items-center py-10"
+              >
+                <div className="w-8 h-8 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" />
+              </motion.div>
+            )}
+
+            {/* FORM */}
+            {submitted === "idle" && (
               <motion.form
                 key="form"
                 onSubmit={handleSubmit}
-                className="space-y-6"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
+                className="space-y-6"
               >
-                <div>
-                  <label className="block mb-2 text-sm">Name</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={form.name}
-                    onChange={handleChange}
-                    required
-                    className="w-full rounded-lg px-4 py-2 bg-white border border-black/10 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 outline-none transition"
-                  />
-                </div>
-
-                <div>
-                  <label className="block mb-2 text-sm">Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    required
-                    className="w-full rounded-lg px-4 py-2 bg-white border border-black/10 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 outline-none transition"
-                  />
-                </div>
+                {["name", "email"].map((field) => (
+                  <div key={field}>
+                    <label className="block mb-2 text-sm capitalize">
+                      {field}
+                    </label>
+                    <input
+                      ref={field === "name" ? nameInputRef : undefined}
+                      type={field === "email" ? "email" : "text"}
+                      name={field}
+                      value={(form as any)[field]}
+                      onChange={handleChange}
+                      required
+                      className="w-full rounded-lg px-4 py-2 bg-white/80 border border-black/10 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 outline-none transition"
+                    />
+                  </div>
+                ))}
 
                 <div>
                   <label className="block mb-2 text-sm">Message</label>
@@ -151,16 +205,18 @@ export default function ContactPage() {
                     onChange={handleChange}
                     required
                     rows={5}
-                    className="w-full rounded-lg px-4 py-2 bg-white border border-black/10 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 outline-none transition"
+                    className="w-full rounded-lg px-4 py-2 bg-white/80 border border-black/10 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 outline-none transition"
                   />
                 </div>
 
-                {/* 💎 PREMIUM CTA */}
+                {/* CTA */}
                 <motion.button
-                  whileTap={{ scale: 0.96 }}
-                  whileHover={{ scale: 1.03 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 200 }}
                   type="submit"
-                  className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 rounded-lg shadow-md hover:shadow-pink-200/40 transition-all duration-300"
+                  disabled={submitted === "loading"}
+                  className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 rounded-lg shadow-lg hover:shadow-pink-300/40 transition-all"
                 >
                   Send Message
                 </motion.button>
@@ -169,6 +225,9 @@ export default function ContactPage() {
           </AnimatePresence>
         </motion.div>
       </div>
+
+      {/* ================= BOTTOM FADE ================= */}
+      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-b from-transparent to-white pointer-events-none" />
     </div>
   );
 }

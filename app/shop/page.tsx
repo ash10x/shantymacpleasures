@@ -86,20 +86,45 @@ export default function ShopPage() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-36">
-      <h1 className="text-3xl md:text-4xl font-semibold mb-10 text-center bg-linear-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-        Shop Our Premium Collection
-      </h1>
+    <div className="relative max-w-7xl mx-auto px-6 py-36 overflow-hidden">
+      {/* ================= AMBIENT GLOW ================= */}
+      <motion.div
+        animate={{ y: [0, -40, 0], x: [0, 30, 0] }}
+        transition={{ duration: 12, repeat: Infinity }}
+        className="absolute w-[30rem] h-[30rem] bg-pink-500/20 blur-[120px] rounded-full top-10 left-[-10rem]"
+      />
+      <motion.div
+        animate={{ y: [0, 50, 0], x: [0, -30, 0] }}
+        transition={{ duration: 14, repeat: Infinity }}
+        className="absolute w-[30rem] h-[30rem] bg-purple-500/20 blur-[120px] rounded-full bottom-0 right-[-10rem]"
+      />
+
+      {/* ================= HEADER ================= */}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="text-center mb-14"
+      >
+        <h1 className="text-3xl md:text-5xl font-semibold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+          Shop Our Premium Collection
+        </h1>
+        <p className="text-gray-500 mt-3 text-sm">
+          Designed for pleasure. Crafted for confidence.
+        </p>
+      </motion.div>
 
       {/* ================= FILTERS ================= */}
-      <div className="flex justify-center gap-4 mb-14 flex-wrap">
+      <div className="flex justify-center gap-4 mb-16 flex-wrap">
         {categories.map((cat) => (
-          <button
+          <motion.button
             key={cat}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
               selectedCategory === cat
-                ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md"
-                : "bg-gray-100 text-gray-700 hover:bg-pink-100"
+                ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg shadow-pink-200/40"
+                : "bg-white/70 backdrop-blur text-gray-700 border border-black/10 hover:bg-pink-50"
             }`}
             onClick={() => {
               setSelectedCategory(cat);
@@ -107,17 +132,20 @@ export default function ShopPage() {
             }}
           >
             {cat}
-          </button>
+          </motion.button>
         ))}
       </div>
 
       {/* ================= PRODUCTS ================= */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-        {currentProducts.map((product) => (
+        {currentProducts.map((product, i) => (
           <motion.div
             key={product.id}
-            whileHover={{ y: -6 }}
-            className="group bg-white rounded-2xl border border-black/10 shadow-sm hover:shadow-xl transition overflow-hidden"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1 }}
+            whileHover={{ y: -8 }}
+            className="group bg-white/80 backdrop-blur rounded-2xl border border-black/10 shadow-sm hover:shadow-2xl hover:shadow-pink-100/40 transition overflow-hidden"
           >
             {/* IMAGE */}
             <div className="overflow-hidden">
@@ -126,21 +154,24 @@ export default function ShopPage() {
                 alt={product.name}
                 width={300}
                 height={300}
-                className="object-contain p-6 group-hover:scale-105 transition duration-500"
+                className="object-contain p-6 group-hover:scale-110 transition duration-700"
               />
             </div>
 
             {/* INFO */}
             <div className="p-5 flex flex-col justify-between">
               <div>
-                <h2 className="font-semibold text-gray-800">{product.name}</h2>
+                <h2 className="font-semibold text-gray-800 group-hover:text-pink-600 transition">
+                  {product.name}
+                </h2>
                 <p className="text-black/60 text-sm mt-1">${product.price}</p>
               </div>
 
               {/* BUTTON */}
               <motion.button
-                whileTap={{ scale: 0.96 }}
-                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 200 }}
                 onClick={() => {
                   addToCart({
                     id: product.id,
@@ -151,7 +182,7 @@ export default function ShopPage() {
 
                   window.dispatchEvent(new Event("open-cart"));
                 }}
-                className="mt-5 w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white py-2 rounded-lg shadow-md hover:shadow-pink-200/40 transition-all duration-300"
+                className="mt-5 w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white py-2.5 rounded-lg shadow-lg hover:shadow-pink-300/40 transition-all duration-300"
               >
                 Add to Cart
               </motion.button>
@@ -162,22 +193,27 @@ export default function ShopPage() {
 
       {/* ================= PAGINATION ================= */}
       {totalPages > 1 && (
-        <div className="flex justify-center gap-3 mt-14 flex-wrap">
+        <div className="flex justify-center gap-3 mt-16 flex-wrap">
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button
+            <motion.button
               key={page}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
               className={`px-4 py-2 rounded-full text-sm font-medium transition ${
                 page === currentPage
-                  ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-pink-100"
+                  ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md"
+                  : "bg-white border border-black/10 text-gray-700 hover:bg-pink-50"
               }`}
               onClick={() => setCurrentPage(page)}
             >
               {page}
-            </button>
+            </motion.button>
           ))}
         </div>
       )}
+
+      {/* ================= BOTTOM FADE ================= */}
+      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-b from-transparent to-white pointer-events-none" />
     </div>
   );
 }

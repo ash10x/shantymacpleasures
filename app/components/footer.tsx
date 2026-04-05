@@ -85,7 +85,9 @@ export default function Footer() {
 
       {/* BOTTOM */}
       <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row items-center justify-between text-sm text-white/70">
-        <p>© {new Date().getFullYear()} Velvet. All rights reserved.</p>
+        <p>
+          © {new Date().getFullYear()} ShantyMac Pleasures. All rights reserved.
+        </p>
 
         <div className="flex gap-6 mt-3 md:mt-0">
           <Link href="/terms">Terms</Link>

@@ -1,10 +1,18 @@
-import { integer, pgTable, varchar } from "drizzle-orm/pg-core";
+import {
+  integer,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  varchar,
+} from "drizzle-orm/pg-core";
 
 export const messages = pgTable("messages", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  name: varchar({ length: 255 }).notNull(),
-  email: varchar({ length: 255 }).notNull().unique(),
-  message: varchar({ length: 255 }).notNull(),
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }),
+  email: varchar("email", { length: 255 }),
+  message: text("message"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const products = pgTable("products", {

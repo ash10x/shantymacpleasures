@@ -5,29 +5,29 @@ import Image from "next/image";
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-white py-36 px-6 relative overflow-hidden">
-      {/* 🌫 Background Glow */}
-      <div className="absolute inset-0 bg-gradient-to-br from-pink-100/40 via-purple-100/30 to-white blur-3xl" />
+    <div className="relative min-h-screen bg-white py-36 px-6 overflow-hidden">
+      {/* ================= AMBIENT BACKGROUND ================= */}
+      <motion.div
+        animate={{ y: [0, -40, 0], x: [0, 30, 0] }}
+        transition={{ duration: 12, repeat: Infinity }}
+        className="absolute w-[30rem] h-[30rem] bg-pink-500/20 blur-[120px] rounded-full top-10 left-[-10rem]"
+      />
+      <motion.div
+        animate={{ y: [0, 50, 0], x: [0, -30, 0] }}
+        transition={{ duration: 14, repeat: Infinity }}
+        className="absolute w-[30rem] h-[30rem] bg-purple-500/20 blur-[120px] rounded-full bottom-0 right-[-10rem]"
+      />
 
-      {/* Floating accents */}
-      <motion.div
-        className="absolute top-10 left-1/4 w-72 h-72 bg-pink-200/30 rounded-full blur-3xl"
-        animate={{ y: [0, 20, 0] }}
-        transition={{ duration: 6, repeat: Infinity }}
-      />
-      <motion.div
-        className="absolute bottom-20 right-1/4 w-64 h-64 bg-purple-200/30 rounded-full blur-3xl"
-        animate={{ y: [0, -20, 0] }}
-        transition={{ duration: 5, repeat: Infinity }}
-      />
+      <div className="absolute inset-0 bg-gradient-to-br from-white via-pink-50/40 to-white" />
 
       {/* ================= HERO ================= */}
       <motion.div
-        className="max-w-4xl mx-auto text-center mb-20 relative z-10"
-        initial={{ opacity: 0, y: -30 }}
+        initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="max-w-4xl mx-auto text-center mb-24 relative z-10"
       >
-        <h1 className="text-4xl md:text-6xl font-semibold leading-tight">
+        <h1 className="text-4xl md:text-6xl font-semibold leading-[1.1]">
           Redefining
           <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
             {" "}
@@ -44,13 +44,14 @@ export default function AboutPage() {
 
       {/* ================= STORY ================= */}
       <motion.div
-        className="max-w-7xl mx-auto grid md:grid-cols-2 gap-14 items-center mb-24 relative z-10"
+        className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center mb-28 relative z-10"
         initial={{ opacity: 0, x: -40 }}
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
       >
-        <div className="space-y-5">
-          <h2 className="text-2xl font-semibold">Our Story</h2>
+        {/* TEXT */}
+        <div className="space-y-6">
+          <h2 className="text-2xl font-semibold text-gray-800">Our Story</h2>
 
           <p className="text-black/60 leading-relaxed">
             Born from a desire to merge design with intimacy, our brand focuses
@@ -59,27 +60,31 @@ export default function AboutPage() {
 
           <p className="text-black/60 leading-relaxed">
             We remove the stigma and replace it with sophistication—offering
-            experiences that are discreet & premium.
+            experiences that are discreet, refined, and deeply personal.
           </p>
         </div>
 
+        {/* IMAGE */}
         <motion.div
-          whileHover={{ scale: 1.02 }}
-          className="overflow-hidden rounded-2xl shadow-xl"
+          whileHover={{ scale: 1.04 }}
+          className="relative overflow-hidden rounded-3xl shadow-2xl"
         >
           <Image
             src="/images/about.jpeg"
             alt="Luxury experience"
             width={600}
             height={400}
-            className="object-cover w-full h-full"
+            className="object-cover w-full h-full transition duration-700 hover:scale-110"
           />
+
+          {/* subtle overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
         </motion.div>
       </motion.div>
 
       {/* ================= VALUES ================= */}
       <motion.div
-        className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8 relative z-10"
+        className="max-w-6xl mx-auto grid md:grid-cols-3 gap-10 relative z-10"
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -100,10 +105,13 @@ export default function AboutPage() {
         ].map((item, i) => (
           <motion.div
             key={i}
-            whileHover={{ y: -5 }}
-            className="backdrop-blur-xl bg-white/70 border border-black/10 rounded-2xl p-6 shadow-md text-center"
+            whileHover={{ y: -10 }}
+            transition={{ type: "spring", stiffness: 200 }}
+            className="group backdrop-blur-xl bg-white/70 border border-black/10 rounded-2xl p-7 shadow-md hover:shadow-xl hover:shadow-pink-100/40 transition text-center"
           >
-            <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
+            <h3 className="text-lg font-semibold mb-2 group-hover:text-pink-600 transition">
+              {item.title}
+            </h3>
             <p className="text-black/60 text-sm">{item.desc}</p>
           </motion.div>
         ))}
@@ -111,8 +119,8 @@ export default function AboutPage() {
 
       {/* ================= CTA ================= */}
       <motion.div
-        className="text-center mt-24 relative z-10"
-        initial={{ opacity: 0, y: 20 }}
+        className="text-center mt-28 relative z-10"
+        initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
       >
         <h2 className="text-2xl md:text-3xl font-semibold">
@@ -121,13 +129,17 @@ export default function AboutPage() {
 
         <motion.a
           href="/shop"
-          whileHover={{ scale: 1.05 }}
+          whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.95 }}
-          className="inline-block mt-6 bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-3 rounded-full shadow-md hover:shadow-pink-200/40 transition"
+          transition={{ type: "spring", stiffness: 200 }}
+          className="inline-block mt-6 bg-gradient-to-r from-pink-500 to-purple-600 text-white px-10 py-3 rounded-full shadow-xl hover:shadow-pink-300/40 transition-all"
         >
           Shop Now
         </motion.a>
       </motion.div>
+
+      {/* ================= BOTTOM FADE ================= */}
+      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-b from-transparent to-white pointer-events-none" />
     </div>
   );
 }
