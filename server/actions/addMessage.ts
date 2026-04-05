@@ -1,6 +1,6 @@
 "use server";
 
-import { db } from "../index";
+import db from "../index";
 import { messages } from "../schema";
 import nodemailer from "nodemailer";
 
