@@ -180,22 +180,30 @@ export default function ContactPage() {
                 animate={{ opacity: 1 }}
                 className="space-y-6"
               >
-                {["name", "email"].map((field) => (
-                  <div key={field}>
-                    <label className="block mb-2 text-sm capitalize">
-                      {field}
-                    </label>
-                    <input
-                      ref={field === "name" ? nameInputRef : undefined}
-                      type={field === "email" ? "email" : "text"}
-                      name={field}
-                      value={(form as any)[field]}
-                      onChange={handleChange}
-                      required
-                      className="w-full rounded-lg px-4 py-2 bg-white/80 border border-black/10 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 outline-none transition"
-                    />
-                  </div>
-                ))}
+                <div>
+                  <label className="block mb-2 text-sm">Name</label>
+                  <input
+                    ref={nameInputRef}
+                    type="text"
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
+                    required
+                    className="w-full rounded-lg px-4 py-2 bg-white/80 border border-black/10 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 outline-none transition"
+                  />
+                </div>
+
+                <div>
+                  <label className="block mb-2 text-sm">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    required
+                    className="w-full rounded-lg px-4 py-2 bg-white/80 border border-black/10 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 outline-none transition"
+                  />
+                </div>
 
                 <div>
                   <label className="block mb-2 text-sm">Message</label>
@@ -215,7 +223,6 @@ export default function ContactPage() {
                   whileTap={{ scale: 0.95 }}
                   transition={{ type: "spring", stiffness: 200 }}
                   type="submit"
-                  disabled={submitted === "loading"}
                   className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 rounded-lg shadow-lg hover:shadow-pink-300/40 transition-all"
                 >
                   Send Message
