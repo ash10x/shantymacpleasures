@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useCart } from "../context/cartContext";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 
 /* ================= PRODUCTS ================= */
 const products = [
@@ -137,40 +138,47 @@ export default function ShopPage() {
       </div>
 
       {/* ================= PRODUCTS ================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         {currentProducts.map((product, i) => (
           <motion.div
             key={product.id}
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            whileHover={{ y: -8 }}
-            className="group bg-white/80 backdrop-blur rounded-2xl border border-black/10 shadow-sm hover:shadow-2xl hover:shadow-pink-100/40 transition overflow-hidden"
+            whileHover={{ y: -10 }}
+            className="group relative bg-white rounded-3xl border border-black/8 shadow-md hover:shadow-2xl hover:shadow-pink-200/60 transition-shadow duration-500 overflow-hidden"
           >
             {/* IMAGE */}
-            <div className="overflow-hidden">
-              <Image
-                src={product.image}
-                alt={product.name}
-                width={300}
-                height={300}
-                className="object-contain p-6 group-hover:scale-110 transition duration-700"
-              />
-            </div>
+            <Link href={`/shop/${product.id}`} className="block">
+              <div className="relative bg-linear-to-br from-pink-50 to-purple-50 overflow-hidden h-52">
+                <Image
+                  src={product.image}
+                  alt={product.name}
+                  fill
+                  className="object-contain p-5 group-hover:scale-110 transition-transform duration-700"
+                />
+                <div className="absolute inset-x-0 bottom-0 h-10 bg-linear-to-t from-white to-transparent" />
+              </div>
+            </Link>
 
             {/* INFO */}
-            <div className="p-5 flex flex-col justify-between">
-              <div>
-                <h2 className="font-semibold text-gray-800 group-hover:text-pink-600 transition">
+            <div className="p-5 flex flex-col gap-1">
+              <span className="text-xs font-semibold uppercase tracking-widest text-pink-500">
+                {product.category}
+              </span>
+              <Link href={`/shop/${product.id}`}>
+                <h2 className="font-semibold text-gray-800 group-hover:text-pink-600 transition-colors leading-snug">
                   {product.name}
                 </h2>
-                <p className="text-black/60 text-sm mt-1">${product.price}</p>
-              </div>
+              </Link>
+              <p className="text-lg font-bold bg-linear-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+                ${product.price}
+              </p>
 
               {/* BUTTON */}
               <motion.button
                 whileTap={{ scale: 0.95 }}
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.03 }}
                 transition={{ type: "spring", stiffness: 200 }}
                 onClick={() => {
                   addToCart({
@@ -182,7 +190,7 @@ export default function ShopPage() {
 
                   window.dispatchEvent(new Event("open-cart"));
                 }}
-                className="mt-5 w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white py-2.5 rounded-lg shadow-lg hover:shadow-pink-300/40 transition-all duration-300"
+                className="mt-3 w-full bg-linear-to-r from-pink-500 to-purple-600 text-white py-2.5 rounded-xl text-sm font-medium shadow-md shadow-pink-200/40 hover:shadow-pink-300/60 transition-shadow duration-300"
               >
                 Add to Cart
               </motion.button>

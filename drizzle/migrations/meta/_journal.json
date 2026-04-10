@@ -8,6 +8,13 @@
       "when": 1774311394103,
       "tag": "0000_equal_leper_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1744128000000,
+      "tag": "0001_add_products_orders",
+      "breakpoints": true
     }
   ]
 }

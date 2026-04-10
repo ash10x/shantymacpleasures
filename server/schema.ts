@@ -1,14 +1,14 @@
 import {
+  boolean,
   integer,
   pgTable,
-  serial,
   text,
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
 
 export const messages = pgTable("messages", {
-  id: serial("id").primaryKey(),
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: varchar("name", { length: 255 }),
   email: varchar("email", { length: 255 }),
   message: text("message"),
@@ -23,6 +23,8 @@ export const products = pgTable("products", {
   description: varchar({ length: 255 }).notNull(),
   image: varchar({ length: 255 }).notNull(),
   category: varchar({ length: 255 }).notNull(),
+  featured: boolean().notNull().default(false),
+  bestseller: boolean().notNull().default(false),
 });
 
 export const orders = pgTable("orders", {
