@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 type CartItem = {
   id: number;
@@ -17,14 +17,41 @@ type CartContextType = {
   increaseQty: (id: number) => void;
   decreaseQty: (id: number) => void;
   total: number;
-  clearCart: () => void; // ✅ added
+  clearCart: () => void;
 };
 
 const CartContext = createContext<CartContextType | null>(null);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false); // ✅ prevents overwrite on first load
 
+  /* ================= LOAD FROM LOCAL STORAGE ================= */
+  useEffect(() => {
+    try {
+      const storedCart = localStorage.getItem("cart");
+      if (storedCart) {
+        setCart(JSON.parse(storedCart));
+      }
+    } catch (err) {
+      console.error("Failed to load cart:", err);
+    } finally {
+      setIsLoaded(true);
+    }
+  }, []);
+
+  /* ================= SAVE TO LOCAL STORAGE ================= */
+  useEffect(() => {
+    if (!isLoaded) return; // ✅ don’t save before initial load
+
+    try {
+      localStorage.setItem("cart", JSON.stringify(cart));
+    } catch (err) {
+      console.error("Failed to save cart:", err);
+    }
+  }, [cart, isLoaded]);
+
+  /* ================= CART FUNCTIONS ================= */
   const addToCart = (product: Omit<CartItem, "quantity">) => {
     setCart((prev) => {
       const existing = prev.find((item) => item.id === product.id);
@@ -67,6 +94,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setCart([]);
   };
 
+  /* ================= TOTAL ================= */
   const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   return (
@@ -78,7 +106,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         increaseQty,
         decreaseQty,
         total,
-        clearCart, // ✅ added
+        clearCart,
       }}
     >
       {children}
@@ -86,6 +114,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+/* ================= HOOK ================= */
 export const useCart = () => {
   const context = useContext(CartContext);
   if (!context) throw new Error("Cart must be used inside CartProvider");
