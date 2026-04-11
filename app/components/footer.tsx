@@ -2,8 +2,27 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Instagram, Twitter, Facebook } from "lucide-react";
+import { Instagram, Twitter, Facebook, Music2 } from "lucide-react";
 import Image from "next/image";
+
+/* ================= SOCIAL LINKS ================= */
+const socialLinks = [
+  {
+    name: "Instagram",
+    icon: Instagram,
+    url: "https://www.instagram.com/shantymacpleasures?igsh=dTZhaDRiZHFjM2Vt",
+  },
+  {
+    name: "Facebook",
+    icon: Facebook,
+    url: "https://facebook.com/shantymacpleasures",
+  },
+  {
+    name: "TikTok",
+    icon: Music2,
+    url: "https://www.tiktok.com/%40shantymacpleasures?_t=ZM-8v3wzyZVVpu&_r=1&fbclid=PAb21jcARGru1leHRuA2FlbQIxMQBzcnRjBmFwcF9pZA81NjcwNjczNDMzNTI0MjcAAafW2T57gPO-CdwQznizDW7o4HIGAgp37pid2Cvvz32_DJ9HtnCdfCEvsq3-yg_aem_8zDgjoVBA_aFKNR0QkCnEQ",
+  },
+];
 
 export default function Footer() {
   return (
@@ -26,15 +45,23 @@ export default function Footer() {
 
           {/* SOCIALS */}
           <div className="flex gap-4 mt-6">
-            {[Instagram, Twitter, Facebook].map((Icon, i) => (
-              <motion.div
-                key={i}
-                whileHover={{ scale: 1.2 }}
-                className="cursor-pointer"
-              >
-                <Icon />
-              </motion.div>
-            ))}
+            {socialLinks.map((social, i) => {
+              const Icon = social.icon;
+
+              return (
+                <motion.a
+                  key={i}
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.2 }}
+                  className="cursor-pointer hover:text-white/80 transition"
+                  aria-label={social.name}
+                >
+                  <Icon />
+                </motion.a>
+              );
+            })}
           </div>
         </div>
 
