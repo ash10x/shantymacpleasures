@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Instagram, Twitter, Facebook, Music2 } from "lucide-react";
+import { Instagram, Facebook, Music2 } from "lucide-react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 /* ================= SOCIAL LINKS ================= */
 const socialLinks = [
@@ -25,6 +26,12 @@ const socialLinks = [
 ];
 
 export default function Footer() {
+  const pathname = usePathname();
+
+  /* ================= ✅ HIDE ON ADMIN ================= */
+  const isAdminRoute = pathname.startsWith("/admin");
+  if (isAdminRoute) return null;
+
   return (
     <footer className="mt-24 bg-[#fb3aa3] text-white">
       {/* TOP */}

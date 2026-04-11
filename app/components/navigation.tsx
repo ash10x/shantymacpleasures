@@ -28,6 +28,10 @@ export default function Navbar() {
   const pathname = usePathname();
   const { cart } = useCart();
 
+  /* ================= ✅ ADMIN HIDE ================= */
+  const isAdminRoute = pathname.startsWith("/admin");
+  if (isAdminRoute) return null;
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
@@ -64,9 +68,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const openCart = () => setCartOpen(true);
-
     window.addEventListener("open-cart", openCart);
-
     return () => window.removeEventListener("open-cart", openCart);
   }, []);
 
@@ -157,7 +159,6 @@ export default function Navbar() {
             >
               <ShoppingCart />
 
-              {/* COUNT BADGE */}
               {cartCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs px-1.5 py-0.5 rounded-full">
                   {cartCount}
@@ -170,7 +171,7 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* ================= SEARCH ================= */}
+      {/* SEARCH */}
       <AnimatePresence>
         {searchOpen && (
           <motion.div
@@ -179,7 +180,6 @@ export default function Navbar() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-white/90 backdrop-blur-2xl flex justify-center pt-32 px-4 z-50"
           >
-            {/* CLOSE BUTTON */}
             <button
               onClick={() => setSearchOpen(false)}
               className="absolute top-6 right-6 p-2 rounded-full bg-black/10 hover:bg-black/20 transition"
@@ -220,10 +220,10 @@ export default function Navbar() {
         )}
       </AnimatePresence>
 
-      {/* ✅ REAL CART */}
+      {/* CART */}
       <MiniCart isOpen={cartOpen} onClose={() => setCartOpen(false)} />
 
-      {/* ================= MOBILE ================= */}
+      {/* MOBILE */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
