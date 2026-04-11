@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   title: "Shantymac Pleasures",
   description:
     "A collection of delightful and whimsical pleasures curated by Shantymac.",
+  icons: {
+    icon: "/logo/logo.png",
+  },
 };
 
 export default function RootLayout({
