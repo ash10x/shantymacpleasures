@@ -3,19 +3,12 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart, Search, Menu, X } from "lucide-react";
 import MiniCart from "./miniCart";
 import { useCart } from "@/app/context/cartContext";
-
-/* ================= MOCK DATA ================= */
-const mockProducts = [
-  { id: 1, name: "Rose Vibrator", price: 49 },
-  { id: 2, name: "Luxury Lingerie Set", price: 89 },
-  { id: 3, name: "Couples Massager", price: 69 },
-  { id: 4, name: "Silk Blindfold", price: 19 },
-];
+import { searchProducts } from "@/server/actions/getProducts";
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -26,6 +19,7 @@ const navLinks = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { cart } = useCart();
 
   const [menuOpen, setMenuOpen] = useState(false);
@@ -33,7 +27,8 @@ export default function Navbar() {
   const [cartOpen, setCartOpen] = useState(false);
 
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<{ id: number; name: string; price: number; image: string; category: string }[]>([]);
+  const [searching, setSearching] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   const searchRef = useRef<HTMLDivElement>(null);
@@ -83,18 +78,26 @@ export default function Navbar() {
 
   /* ================= SEARCH ================= */
   useEffect(() => {
-    const delay = setTimeout(() => {
-      if (!query) return setResults([]);
-
-      const filtered = mockProducts.filter((p) =>
-        p.name.toLowerCase().includes(query.toLowerCase()),
-      );
-
-      setResults(filtered);
-    }, 200);
+    const delay = setTimeout(async () => {
+      if (!query.trim()) return setResults([]);
+      setSearching(true);
+      try {
+        const data = await searchProducts(query.trim());
+        setResults(data);
+      } finally {
+        setSearching(false);
+      }
+    }, 250);
 
     return () => clearTimeout(delay);
   }, [query]);
+
+  const handleResultClick = (id: number) => {
+    setSearchOpen(false);
+    setQuery("");
+    setResults([]);
+    router.push(`/shop/${id}`);
+  };
 
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -201,18 +204,26 @@ export default function Navbar() {
                   <p className="text-gray-400">Start typing to search...</p>
                 )}
 
-                {query && results.length === 0 && (
+                {query && searching && (
+                  <p className="text-gray-400">Searching...</p>
+                )}
+
+                {query && !searching && results.length === 0 && (
                   <p className="text-gray-500">No products found</p>
                 )}
 
                 {results.map((item) => (
-                  <div
+                  <button
                     key={item.id}
-                    className="flex justify-between p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition"
+                    onClick={() => handleResultClick(item.id)}
+                    className="w-full flex items-center justify-between p-3 hover:bg-pink-50 rounded-xl cursor-pointer transition text-left group"
                   >
-                    <span>{item.name}</span>
-                    <span className="text-gray-500">${item.price}</span>
-                  </div>
+                    <div>
+                      <p className="font-medium text-gray-800 group-hover:text-pink-600 transition">{item.name}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">{item.category}</p>
+                    </div>
+                    <span className="text-pink-600 font-semibold">${item.price}</span>
+                  </button>
                 ))}
               </div>
             </div>

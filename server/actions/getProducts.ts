@@ -2,7 +2,7 @@
 
 import db from "../index";
 import { products } from "../schema";
-import { eq } from "drizzle-orm";
+import { eq, ilike } from "drizzle-orm";
 
 export async function getProducts() {
   return await db.select().from(products);
@@ -19,4 +19,11 @@ export async function getBestsellers() {
 
 export async function getFeaturedProducts() {
   return await db.select().from(products).where(eq(products.featured, true));
+}
+
+export async function searchProducts(query: string) {
+  return await db
+    .select()
+    .from(products)
+    .where(ilike(products.name, `%${query}%`));
 }
