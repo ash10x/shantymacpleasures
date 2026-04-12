@@ -68,15 +68,8 @@ export default function Navbar() {
   }, []);
 
   /* ================= CLICK OUTSIDE ================= */
-  useEffect(() => {
-    const handler = (e: any) => {
-      if (searchRef.current && !searchRef.current.contains(e.target)) {
-        setResults([]);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
+  // Intentionally not clearing results on outside click — the search overlay
+  // is a full-screen modal; clicking outside the input box should not wipe results.
 
   /* ================= SEARCH ================= */
   useEffect(() => {
@@ -93,6 +86,16 @@ export default function Navbar() {
 
     return () => clearTimeout(delay);
   }, [query]);
+
+  // Re-run search when overlay reopens with an existing query
+  useEffect(() => {
+    if (searchOpen && query.trim()) {
+      setSearching(true);
+      searchProducts(query.trim())
+        .then(setResults)
+        .finally(() => setSearching(false));
+    }
+  }, [searchOpen]);
 
   const handleResultClick = (id: number) => {
     setSearchOpen(false);
@@ -216,13 +219,22 @@ export default function Navbar() {
                   <button
                     key={item.id}
                     onClick={() => handleResultClick(item.id)}
-                    className="w-full flex items-center justify-between p-3 hover:bg-pink-50 rounded-xl cursor-pointer transition text-left group"
+                    className="w-full flex items-center gap-3 p-3 hover:bg-pink-50 rounded-xl cursor-pointer transition text-left group"
                   >
-                    <div>
-                      <p className="font-medium text-gray-800 group-hover:text-pink-600 transition">{item.name}</p>
+                    {/* Thumbnail */}
+                    <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-pink-50 shrink-0">
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        className="object-contain p-1"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-800 group-hover:text-pink-600 transition truncate">{item.name}</p>
                       <p className="text-xs text-gray-400 mt-0.5">{item.category}</p>
                     </div>
-                    <span className="text-pink-600 font-semibold">${item.price}</span>
+                    <span className="text-pink-600 font-semibold shrink-0">${item.price}</span>
                   </button>
                 ))}
               </div>
