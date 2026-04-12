@@ -10,15 +10,15 @@ export default function AboutPage() {
       <motion.div
         animate={{ y: [0, -40, 0], x: [0, 30, 0] }}
         transition={{ duration: 12, repeat: Infinity }}
-        className="absolute w-[30rem] h-[30rem] bg-pink-500/20 blur-[120px] rounded-full top-10 left-[-10rem]"
+        className="absolute w-120 h-120 bg-pink-500/20 blur-[120px] rounded-full top-10 -left-40"
       />
       <motion.div
         animate={{ y: [0, 50, 0], x: [0, -30, 0] }}
         transition={{ duration: 14, repeat: Infinity }}
-        className="absolute w-[30rem] h-[30rem] bg-purple-500/20 blur-[120px] rounded-full bottom-0 right-[-10rem]"
+        className="absolute w-120 h-120 bg-purple-500/20 blur-[120px] rounded-full bottom-0 -right-40"
       />
 
-      <div className="absolute inset-0 bg-gradient-to-br from-white via-pink-50/40 to-white" />
+      <div className="absolute inset-0 bg-linear-to-br from-white via-pink-50/40 to-white" />
 
       {/* ================= HERO ================= */}
       <motion.div
@@ -29,7 +29,7 @@ export default function AboutPage() {
       >
         <h1 className="text-4xl md:text-6xl font-semibold leading-[1.1]">
           Redefining
-          <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+          <span className="bg-linear-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
             {" "}
             Intimacy & Luxury
           </span>
@@ -78,7 +78,7 @@ export default function AboutPage() {
           />
 
           {/* subtle overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/10 to-transparent" />
         </motion.div>
       </motion.div>
 
@@ -132,14 +132,14 @@ export default function AboutPage() {
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.95 }}
           transition={{ type: "spring", stiffness: 200 }}
-          className="inline-block mt-6 bg-gradient-to-r from-pink-500 to-purple-600 text-white px-10 py-3 rounded-full shadow-xl hover:shadow-pink-300/40 transition-all"
+          className="inline-block mt-6 bg-linear-to-r from-pink-500 to-purple-600 text-white px-10 py-3 rounded-full shadow-xl hover:shadow-pink-300/40 transition-all"
         >
           Shop Now
         </motion.a>
       </motion.div>
 
       {/* ================= BOTTOM FADE ================= */}
-      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-b from-transparent to-white pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-full h-32 bg-linear-to-b from-transparent to-white pointer-events-none" />
     </div>
   );
 }

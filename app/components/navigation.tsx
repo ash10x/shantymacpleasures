@@ -5,10 +5,32 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, Search, Menu, X } from "lucide-react";
+import { ShoppingCart, Search, Menu, X, ShieldCheck } from "lucide-react";
 import MiniCart from "./miniCart";
 import { useCart } from "@/app/context/cartContext";
 import { searchProducts } from "@/server/actions/getProducts";
+
+function AdminQuickLink() {
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/auth/me").then((r) => {
+      if (r.ok) setIsAdmin(true);
+    });
+  }, []);
+
+  if (!isAdmin) return null;
+
+  return (
+    <Link
+      href="/admin/dashboard"
+      className="flex items-center gap-1.5 rounded-full border border-pink-200 bg-pink-50 px-3 py-1 text-xs font-semibold text-pink-600 transition hover:bg-pink-100"
+    >
+      <ShieldCheck size={13} />
+      Admin
+    </Link>
+  );
+}
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -22,20 +44,18 @@ export default function Navbar() {
   const router = useRouter();
   const { cart } = useCart();
 
-  /* ================= ✅ ADMIN HIDE ================= */
-  const isAdminRoute = pathname.startsWith("/admin");
-  if (isAdminRoute) return null;
-
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
-
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<{ id: number; name: string; price: number; image: string; category: string }[]>([]);
   const [searching, setSearching] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   const searchRef = useRef<HTMLDivElement>(null);
+
+  /* ================= ADMIN HIDE ================= */
+  const isAdminRoute = pathname.startsWith("/admin");
 
   /* ================= SCROLL ================= */
   useEffect(() => {
@@ -95,7 +115,7 @@ export default function Navbar() {
         .then(setResults)
         .finally(() => setSearching(false));
     }
-  }, [searchOpen]);
+  }, [searchOpen, query]);
 
   const handleResultClick = (id: number) => {
     setSearchOpen(false);
@@ -105,6 +125,8 @@ export default function Navbar() {
   };
 
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+
+  if (isAdminRoute) return null;
 
   return (
     <>
@@ -140,11 +162,11 @@ export default function Navbar() {
                     {active && (
                       <motion.div
                         layoutId="pill"
-                        className="absolute -bottom-2 left-0 right-0 h-[3px] bg-pink-500 rounded-full"
+                        className="absolute -bottom-2 left-0 right-0 h-0.75 bg-pink-500 rounded-full"
                       />
                     )}
 
-                    <span className="absolute left-0 -bottom-2 h-[3px] w-0 bg-pink-400 group-hover:w-full transition-all duration-300" />
+                    <span className="absolute left-0 -bottom-2 h-0.75 w-0 bg-pink-400 group-hover:w-full transition-all duration-300" />
                   </div>
                 </Link>
               );
@@ -153,6 +175,7 @@ export default function Navbar() {
 
           {/* ACTIONS */}
           <div className="flex items-center gap-5">
+            <AdminQuickLink />
             <Search
               onClick={() => setSearchOpen(true)}
               className="cursor-pointer hover:scale-110 transition"
@@ -263,6 +286,7 @@ export default function Navbar() {
                   {link.name}
                 </Link>
               ))}
+              <AdminQuickLink />
             </div>
           </motion.div>
         )}

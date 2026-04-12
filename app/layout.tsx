@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import Navbar from "./components/navigation";
-import Footer from "./components/footer";
+import PublicShell from "./components/PublicShell";
 import { CartProvider } from "./context/cartContext";
 import "./globals.css";
 
@@ -28,9 +27,9 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <CartProvider>
-          <Navbar />
-          {children}
-          <Footer />
+          <PublicShell>
+            {children}
+          </PublicShell>
         </CartProvider>
       </body>
     </html>

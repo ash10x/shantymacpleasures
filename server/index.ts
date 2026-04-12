@@ -3,6 +3,6 @@ import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "./schema";
 
 const sql = neon(process.env.DATABASE_URL!);
-const db = drizzle({ client: sql, schema, logger: true });
+const db = drizzle({ client: sql, schema, logger: process.env.NODE_ENV !== "production" });
 
 export default db;

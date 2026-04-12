@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { addMessage } from "@/server/actions/addMessage";
 
 type SubmitState = "idle" | "loading" | "success" | "error";
 
@@ -25,20 +26,14 @@ export default function ContactPage() {
     setSubmitted("loading");
 
     try {
-      const res = await fetch("/server/actions/addMessage", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+      const result = await addMessage(form);
 
-      const data = await res.json();
-
-      if (res.ok) {
+      if (result.success) {
         setSubmitted("success");
         setForm({ name: "", email: "", message: "" });
       } else {
         setSubmitted("error");
-        console.error(data.message);
+        console.error(result.error);
       }
     } catch (err) {
       setSubmitted("error");
@@ -54,15 +49,15 @@ export default function ContactPage() {
       <motion.div
         animate={{ y: [0, -40, 0], x: [0, 30, 0] }}
         transition={{ duration: 12, repeat: Infinity }}
-        className="absolute w-[30rem] h-[30rem] bg-pink-500/20 blur-[120px] rounded-full top-10 left-[-10rem]"
+        className="absolute w-120 h-120 bg-pink-500/20 blur-[120px] rounded-full top-10 -left-40"
       />
       <motion.div
         animate={{ y: [0, 50, 0], x: [0, -30, 0] }}
         transition={{ duration: 14, repeat: Infinity }}
-        className="absolute w-[30rem] h-[30rem] bg-purple-500/20 blur-[120px] rounded-full bottom-0 right-[-10rem]"
+        className="absolute w-120 h-120 bg-purple-500/20 blur-[120px] rounded-full bottom-0 -right-40"
       />
 
-      <div className="absolute inset-0 bg-gradient-to-br from-white via-pink-50/40 to-white" />
+      <div className="absolute inset-0 bg-linear-to-br from-white via-pink-50/40 to-white" />
 
       {/* ================= HEADER ================= */}
       <motion.div
@@ -71,7 +66,7 @@ export default function ContactPage() {
         transition={{ duration: 0.8 }}
         className="text-center mb-16 relative z-10"
       >
-        <h1 className="text-4xl md:text-5xl font-semibold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+        <h1 className="text-4xl md:text-5xl font-semibold bg-linear-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
           Let’s Talk
         </h1>
         <p className="text-black/60 mt-3 max-w-xl mx-auto">
@@ -223,7 +218,7 @@ export default function ContactPage() {
                   whileTap={{ scale: 0.95 }}
                   transition={{ type: "spring", stiffness: 200 }}
                   type="submit"
-                  className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 rounded-lg shadow-lg hover:shadow-pink-300/40 transition-all"
+                  className="w-full bg-linear-to-r from-pink-500 to-purple-600 text-white py-3 rounded-lg shadow-lg hover:shadow-pink-300/40 transition-all"
                 >
                   Send Message
                 </motion.button>
@@ -234,7 +229,7 @@ export default function ContactPage() {
       </div>
 
       {/* ================= BOTTOM FADE ================= */}
-      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-b from-transparent to-white pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-full h-32 bg-linear-to-b from-transparent to-white pointer-events-none" />
     </div>
   );
 }

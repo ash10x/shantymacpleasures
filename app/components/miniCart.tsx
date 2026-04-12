@@ -107,7 +107,7 @@ export default function MiniCart({
               <Link href="/checkout">
                 <button
                   onClick={onClose}
-                  className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 rounded-lg shadow-md hover:shadow-pink-200/40 transition"
+                  className="w-full bg-linear-to-r from-pink-500 to-purple-600 text-white py-3 rounded-lg shadow-md hover:shadow-pink-200/40 transition"
                 >
                   Checkout
                 </button>

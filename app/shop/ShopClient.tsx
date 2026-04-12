@@ -105,6 +105,13 @@ export default function ShopClient({ products, categories }: Props) {
               </div>
             </Link>
 
+            {/* OUT OF STOCK BADGE */}
+            {product.quantity === 0 && (
+              <div className="absolute top-3 left-3 bg-black/70 text-white text-xs font-semibold px-2.5 py-1 rounded-full">
+                Out of Stock
+              </div>
+            )}
+
             {/* INFO */}
             <div className="p-5 flex flex-col gap-1">
               <span className="text-xs font-semibold uppercase tracking-widest text-pink-500">
@@ -121,10 +128,12 @@ export default function ShopClient({ products, categories }: Props) {
 
               {/* BUTTON */}
               <motion.button
-                whileTap={{ scale: 0.95 }}
-                whileHover={{ scale: 1.03 }}
+                whileTap={product.quantity > 0 ? { scale: 0.95 } : undefined}
+                whileHover={product.quantity > 0 ? { scale: 1.03 } : undefined}
                 transition={{ type: "spring", stiffness: 200 }}
+                disabled={product.quantity === 0}
                 onClick={() => {
+                  if (product.quantity === 0) return;
                   addToCart({
                     id: product.id,
                     name: product.name,
@@ -133,9 +142,13 @@ export default function ShopClient({ products, categories }: Props) {
                   });
                   window.dispatchEvent(new Event("open-cart"));
                 }}
-                className="mt-3 w-full bg-linear-to-r from-pink-500 to-purple-600 text-white py-2.5 rounded-xl text-sm font-medium shadow-md shadow-pink-200/40 hover:shadow-pink-300/60 transition-shadow duration-300"
+                className={`mt-3 w-full py-2.5 rounded-xl text-sm font-medium transition-shadow duration-300 ${
+                  product.quantity === 0
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-linear-to-r from-pink-500 to-purple-600 text-white shadow-md shadow-pink-200/40 hover:shadow-pink-300/60"
+                }`}
               >
-                Add to Cart
+                {product.quantity === 0 ? "Out of Stock" : "Add to Cart"}
               </motion.button>
             </div>
           </motion.div>

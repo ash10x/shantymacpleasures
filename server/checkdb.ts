@@ -1,11 +1,9 @@
-import "dotenv/config";
+import { config } from "dotenv";
+config({ path: ".env.local" });
 import { neon } from "@neondatabase/serverless";
 
 const sql = neon(process.env.DATABASE_URL!);
 
-Promise.all([
-  sql`UPDATE products SET bestseller = true WHERE id IN (1, 2, 6)`,
-  sql`UPDATE products SET featured = true WHERE id IN (3, 4, 5, 7)`,
-])
-  .then(() => { console.log("Done"); process.exit(0); })
+sql`SELECT column_name FROM information_schema.columns WHERE table_name='orders' ORDER BY ordinal_position`
+  .then((cols) => { console.log("Orders columns:", cols.map((c: Record<string, string>) => c.column_name).join(", ")); process.exit(0); })
   .catch((e) => { console.error(e); process.exit(1); });
