@@ -15,15 +15,26 @@ export default function CheckoutPage() {
   const { cart, clearCart } = useCart();
   const router = useRouter();
 
-  const [form, setForm] = useState({ name: "", email: "", address: "", city: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    address: "",
+    city: "",
+  });
   const [couponCode, setCouponCode] = useState("");
   const [discount, setDiscount] = useState(0);
-  const [couponMsg, setCouponMsg] = useState<{ text: string; ok: boolean } | null>(null);
+  const [couponMsg, setCouponMsg] = useState<{
+    text: string;
+    ok: boolean;
+  } | null>(null);
   const [couponPending, startCouponTransition] = useTransition();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState("");
 
-  const subtotal = cart.reduce((s: number, i: any) => s + i.price * i.quantity, 0);
+  const subtotal = cart.reduce(
+    (s: number, i: any) => s + i.price * i.quantity,
+    0,
+  );
   const grandTotal = Math.max(0, subtotal - discount);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -37,7 +48,10 @@ export default function CheckoutPage() {
       try {
         const result = await validateCoupon(couponCode, subtotal);
         setDiscount(result.discount);
-        setCouponMsg({ text: `Coupon applied! You save $${(result.discount / 100).toFixed(2)}`, ok: true });
+        setCouponMsg({
+          text: `Coupon applied! You save $${(result.discount / 100).toFixed(2)}`,
+          ok: true,
+        });
       } catch (e) {
         setCouponMsg({ text: getErrMsg(e), ok: false });
       }
@@ -56,10 +70,17 @@ export default function CheckoutPage() {
           customerAddress: form.address,
           customerCity: form.city,
           couponCode: couponCode || undefined,
-          cart: cart.map((i: any) => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
+          cart: cart.map((i: any) => ({
+            id: i.id,
+            name: i.name,
+            price: i.price,
+            quantity: i.quantity,
+          })),
         });
         clearCart();
-        router.push(`/checkout/confirmation?ids=${orderIds.join(",")}&email=${encodeURIComponent(form.email)}`);
+        router.push(
+          `/checkout/confirmation?ids=${orderIds.join(",")}&email=${encodeURIComponent(form.email)}`,
+        );
       } catch (e) {
         setError(getErrMsg(e));
       }
@@ -80,14 +101,42 @@ export default function CheckoutPage() {
           <h2 className="text-2xl font-semibold mb-6">Checkout Details</h2>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            <input type="text" name="name" placeholder="Full Name" required value={form.name} onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-black/10 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 outline-none" />
-            <input type="email" name="email" placeholder="Email Address" required value={form.email} onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-black/10 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 outline-none" />
-            <input type="text" name="address" placeholder="Shipping Address" required value={form.address} onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-black/10 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 outline-none" />
-            <input type="text" name="city" placeholder="City" required value={form.city} onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-black/10 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 outline-none" />
+            <input
+              type="text"
+              name="name"
+              placeholder="Full Name"
+              required
+              value={form.name}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-lg border border-black/10 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 outline-none"
+            />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email Address"
+              required
+              value={form.email}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-lg border border-black/10 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 outline-none"
+            />
+            <input
+              type="text"
+              name="address"
+              placeholder="Shipping Address"
+              required
+              value={form.address}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-lg border border-black/10 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 outline-none"
+            />
+            <input
+              type="text"
+              name="city"
+              placeholder="City"
+              required
+              value={form.city}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-lg border border-black/10 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 outline-none"
+            />
 
             {/* Coupon */}
             <div className="rounded-xl border border-black/10 bg-white/50 p-4 space-y-2">
@@ -98,7 +147,11 @@ export default function CheckoutPage() {
                 <input
                   type="text"
                   value={couponCode}
-                  onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponMsg(null); setDiscount(0); }}
+                  onChange={(e) => {
+                    setCouponCode(e.target.value.toUpperCase());
+                    setCouponMsg(null);
+                    setDiscount(0);
+                  }}
                   placeholder="ENTER CODE"
                   className="flex-1 px-4 py-2.5 rounded-lg border border-black/10 font-mono text-sm uppercase focus:border-pink-500 focus:ring-1 focus:ring-pink-500 outline-none"
                 />
@@ -108,12 +161,22 @@ export default function CheckoutPage() {
                   disabled={couponPending || !couponCode.trim()}
                   className="px-4 py-2.5 rounded-lg bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition disabled:opacity-50"
                 >
-                  {couponPending ? <Loader2 size={15} className="animate-spin" /> : "Apply"}
+                  {couponPending ? (
+                    <Loader2 size={15} className="animate-spin" />
+                  ) : (
+                    "Apply"
+                  )}
                 </button>
               </div>
               {couponMsg && (
-                <p className={`text-xs font-medium flex items-center gap-1 ${couponMsg.ok ? "text-green-600" : "text-red-500"}`}>
-                  {couponMsg.ok ? <Check size={13} /> : <AlertCircle size={13} />}
+                <p
+                  className={`text-xs font-medium flex items-center gap-1 ${couponMsg.ok ? "text-green-600" : "text-red-500"}`}
+                >
+                  {couponMsg.ok ? (
+                    <Check size={13} />
+                  ) : (
+                    <AlertCircle size={13} />
+                  )}
                   {couponMsg.text}
                 </p>
               )}
@@ -156,8 +219,12 @@ export default function CheckoutPage() {
             <div className="space-y-4">
               {cart.map((item: any) => (
                 <div key={item.id} className="flex justify-between text-sm">
-                  <span>{item.name} × {item.quantity}</span>
-                  <span>${(item.price * item.quantity / 100).toFixed(2)}</span>
+                  <span>
+                    {item.name} × {item.quantity}
+                  </span>
+                  <span>
+                    ${((item.price * item.quantity) / 100).toFixed(2)}
+                  </span>
                 </div>
               ))}
               <div className="border-t pt-4 space-y-2">
@@ -183,4 +250,3 @@ export default function CheckoutPage() {
     </div>
   );
 }
-
