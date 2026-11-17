@@ -28,11 +28,11 @@ function ConfirmationContent() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          Order Confirmed
+          Order Request Received
         </motion.h1>
 
         <p className="text-black/60 mb-10">
-          Thank you for your purchase. Your order has been received and is being processed with discretion.
+          Thank you. Your order request has been received. We will confirm product availability, final charges, payment instructions, and acceptance with you. No payment has been processed by this website.
         </p>
 
         <motion.div
@@ -61,13 +61,7 @@ function ConfirmationContent() {
               Continue Shopping
             </motion.button>
           </Link>
-          {email && (
-            <Link href={`/orders?email=${encodeURIComponent(email)}`}>
-              <button className="px-6 py-3 rounded-full border border-black/20 hover:bg-gray-100 transition">
-                Track Your Orders
-              </button>
-            </Link>
-          )}
+          {email && <a href="mailto:shantymacpleasures@yahoo.com" className="px-6 py-3 rounded-full border border-black/20 hover:bg-gray-100 transition">Contact Us About This Order</a>}
           <Link href="/">
             <button className="px-6 py-3 rounded-full border border-black/20 hover:bg-gray-100 transition">
               Back to Home
@@ -75,9 +69,7 @@ function ConfirmationContent() {
           </Link>
         </div>
 
-        <p className="text-xs text-black/50 mt-8">
-          🔒 Discreet packaging • Secure processing • Premium support
-        </p>
+        <p className="text-xs text-black/50 mt-8">We will contact you about order availability and payment.</p>
       </div>
     </div>
   );

@@ -18,15 +18,27 @@ export async function addMessage(data: {
   email: string;
   message: string;
 }): Promise<{ success: boolean; error?: string }> {
-  if (!data.name || !data.email || !data.message) {
+  if (typeof data.name !== "string" || typeof data.email !== "string" || typeof data.message !== "string" || !data.name.trim() || !data.email.trim() || !data.message.trim()) {
     return { success: false, error: "All fields are required." };
   }
   if (data.name.length > 100 || data.email.length > 255 || data.message.length > 2000) {
     return { success: false, error: "Input exceeds maximum allowed length." };
   }
-  if (!data.email.includes("@")) {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
     return { success: false, error: "Invalid email address." };
   }
+
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS || !process.env.SMTP_PORT) {
+    return { success: false, error: "Contact form email is not configured." };
+  }
+
+  const adminEmail = "shantymacpleasures@yahoo.com";
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT),
+    secure: process.env.SMTP_SECURE === "true",
+    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+  });
 
   // 1. Save to DB
   await db.insert(messages).values({
@@ -36,17 +48,6 @@ export async function addMessage(data: {
   });
 
   // 2. Configure transporter
-  const adminEmail = process.env.SMTP_USER!;
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT),
-    secure: process.env.SMTP_SECURE === "true",
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-
   // 3. Notify admin
   await transporter.sendMail({
     from: `"Shanty Mac Pleasures" <${adminEmail}>`,
@@ -121,7 +122,7 @@ export async function addMessage(data: {
         <!-- Header -->
         <tr>
           <td style="background:linear-gradient(135deg,#ec4899,#9333ea);padding:40px 40px 32px;text-align:center;">
-            <h1 style="margin:0 0 8px;color:#ffffff;font-size:26px;font-weight:700;">Thank you, ${data.name}!</h1>
+            <h1 style="margin:0 0 8px;color:#ffffff;font-size:26px;font-weight:700;">Thank you, ${escHtml(data.name)}!</h1>
             <p style="margin:0;color:rgba(255,255,255,0.85);font-size:14px;">We've received your message and will be in touch soon.</p>
           </td>
         </tr>
@@ -141,7 +142,7 @@ export async function addMessage(data: {
             </div>
             <p style="margin:0;font-size:15px;color:#374151;line-height:1.6;">
               If you have any urgent questions, you can reach us directly at 
-              <a href="mailto:dinoshand@gmail.com" style="color:#ec4899;text-decoration:none;font-weight:600;">dinoshand@gmail.com</a>.
+              <a href="mailto:shantymacpleasures@yahoo.com" style="color:#ec4899;text-decoration:none;font-weight:600;">shantymacpleasures@yahoo.com</a>.
             </p>
           </td>
         </tr>

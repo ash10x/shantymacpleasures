@@ -3,6 +3,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { getProductById } from "../../../server/actions/getProducts";
 import AddToCartButton from "./AddToCartButton";
+import { formatMoney } from "@/server/lib/money";
+import type { Metadata } from "next";
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const product = await getProductById(Number(id));
+  if (!product) return { title: "Product not found" };
+  return { title: product.name, description: product.description, openGraph: { title: product.name, description: product.description, images: [product.image], type: "website" } };
+}
 
 export default async function ProductPage({
   params,
@@ -54,7 +63,7 @@ export default async function ProductPage({
               {product.description}
             </p>
             <p className="mt-6 text-2xl font-bold bg-linear-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-              ${product.price}
+              {formatMoney(product.price)}
             </p>
             <p className="mt-1 text-xs text-gray-400">
               {product.quantity > 0 ? `${product.quantity} in stock` : "Out of stock"}

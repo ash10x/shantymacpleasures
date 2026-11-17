@@ -6,6 +6,7 @@ import { useCart } from "../context/cartContext";
 import { placeOrder, validateCoupon } from "@/server/actions/addOrder";
 import { motion } from "framer-motion";
 import { Loader2, Tag, Check, AlertCircle } from "lucide-react";
+import { formatMoney } from "@/server/lib/money";
 
 function getErrMsg(e: unknown) {
   return e instanceof Error ? e.message : "Something went wrong.";
@@ -32,7 +33,7 @@ export default function CheckoutPage() {
   const [error, setError] = useState("");
 
   const subtotal = cart.reduce(
-    (s: number, i: any) => s + i.price * i.quantity,
+    (s, i) => s + i.price * i.quantity,
     0,
   );
   const grandTotal = Math.max(0, subtotal - discount);
@@ -49,7 +50,7 @@ export default function CheckoutPage() {
         const result = await validateCoupon(couponCode, subtotal);
         setDiscount(result.discount);
         setCouponMsg({
-          text: `Coupon applied! You save $${(result.discount / 100).toFixed(2)}`,
+          text: `Coupon applied! You save ${formatMoney(result.discount)}`,
           ok: true,
         });
       } catch (e) {
@@ -70,7 +71,7 @@ export default function CheckoutPage() {
           customerAddress: form.address,
           customerCity: form.city,
           couponCode: couponCode || undefined,
-          cart: cart.map((i: any) => ({
+          cart: cart.map((i) => ({
             id: i.id,
             name: i.name,
             price: i.price,
@@ -199,9 +200,7 @@ export default function CheckoutPage() {
               {isPending ? "Placing order…" : "Complete Order"}
             </motion.button>
 
-            <p className="text-xs text-black/50 text-center mt-2">
-              🔒 Secure checkout • Discreet packaging guaranteed
-            </p>
+            <p className="text-xs text-black/50 text-center mt-2">Order requests are reviewed before payment is arranged.</p>
           </form>
         </motion.div>
 
@@ -217,30 +216,30 @@ export default function CheckoutPage() {
             <p className="text-black/60">Your cart is empty.</p>
           ) : (
             <div className="space-y-4">
-              {cart.map((item: any) => (
+              {cart.map((item) => (
                 <div key={item.id} className="flex justify-between text-sm">
                   <span>
                     {item.name} × {item.quantity}
                   </span>
                   <span>
-                    ${((item.price * item.quantity) / 100).toFixed(2)}
+                    {formatMoney(item.price * item.quantity)}
                   </span>
                 </div>
               ))}
               <div className="border-t pt-4 space-y-2">
                 <div className="flex justify-between text-sm text-black/60">
                   <span>Subtotal</span>
-                  <span>${(subtotal / 100).toFixed(2)}</span>
+                  <span>{formatMoney(subtotal)}</span>
                 </div>
                 {discount > 0 && (
                   <div className="flex justify-between text-sm text-green-600 font-medium">
                     <span>Discount</span>
-                    <span>−${(discount / 100).toFixed(2)}</span>
+                    <span>−{formatMoney(discount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between font-semibold text-lg">
                   <span>Total</span>
-                  <span>${(grandTotal / 100).toFixed(2)}</span>
+                  <span>{formatMoney(grandTotal)}</span>
                 </div>
               </div>
             </div>

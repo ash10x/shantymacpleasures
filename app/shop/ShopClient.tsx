@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import type { products } from "@/server/schema";
+import { formatMoney } from "@/server/lib/money";
 
 type Product = typeof products.$inferSelect;
 
@@ -123,7 +124,7 @@ export default function ShopClient({ products, categories }: Props) {
                 </h2>
               </Link>
               <p className="text-lg font-bold bg-linear-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                ${product.price}
+                {formatMoney(product.price)}
               </p>
 
               {/* BUTTON */}

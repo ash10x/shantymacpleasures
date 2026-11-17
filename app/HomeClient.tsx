@@ -6,28 +6,9 @@ import Image from "next/image";
 import { useCart } from "@/app/context/cartContext";
 import { useState } from "react";
 import type { products } from "@/server/schema";
+import { formatMoney } from "@/server/lib/money";
 
 type Product = typeof products.$inferSelect;
-
-const comingSoon = [
-  { id: 201, name: "Smart App-Control Vibrator", image: "/products/rose1.jpg" },
-  { id: 202, name: "Luxury Couple Sync Set", image: "/products/vibrator.jpg" },
-];
-
-const bundles = [
-  {
-    id: 101,
-    name: "Starter Kit",
-    desc: "Perfect introduction to premium pleasure",
-    price: 89,
-  },
-  {
-    id: 102,
-    name: "Couples Kit",
-    desc: "Designed for shared experiences",
-    price: 129,
-  },
-];
 
 interface Props {
   bestsellers: Product[];
@@ -117,11 +98,7 @@ export default function HomeClient({ bestsellers, featuredProducts }: Props) {
             </motion.button>
           </Link>
 
-          <div className="mt-6 flex justify-center gap-5 text-xs text-white/70">
-            <span>🔒 Discreet Shipping</span>
-            <span>💳 Secure Checkout</span>
-            <span>⚡ Fast Delivery</span>
-          </div>
+          <p className="mt-6 text-xs text-white/80">Based in Montego Bay, Jamaica</p>
         </motion.div>
 
         <motion.div
@@ -171,7 +148,7 @@ export default function HomeClient({ bestsellers, featuredProducts }: Props) {
                   </h3>
                   <div className="mt-2 flex items-center justify-between">
                     <p className="text-xl font-bold bg-linear-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                      ${item.price}
+                      {formatMoney(item.price)}
                     </p>
                     <span className="text-sm font-medium text-pink-600 group-hover:translate-x-1 transition-transform inline-block">
                       View Product →
@@ -184,11 +161,11 @@ export default function HomeClient({ bestsellers, featuredProducts }: Props) {
         </section>
       )}
 
-      {/* ================= BESTSELLERS ================= */}
+      {/* ================= SHOP HIGHLIGHTS ================= */}
       {bestsellers.length > 0 && (
         <section className="py-24 px-6 max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-semibold mb-12">
-            Bestsellers
+            Shop Highlights
           </h2>
 
           <div className="grid md:grid-cols-3 gap-10">
@@ -201,7 +178,7 @@ export default function HomeClient({ bestsellers, featuredProducts }: Props) {
               >
                 {/* Badge */}
                 <span className="absolute top-3 left-3 z-10 bg-linear-to-r from-pink-500 to-purple-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
-                  🔥 Bestseller
+                  Featured
                 </span>
 
                 {/* Image area */}
@@ -226,7 +203,7 @@ export default function HomeClient({ bestsellers, featuredProducts }: Props) {
                   </Link>
                   <p className="mt-1 text-xs text-gray-400 uppercase tracking-wider">{product.category}</p>
                   <p className="mt-2 text-lg font-bold bg-linear-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                    ${product.price}
+                  {formatMoney(product.price)}
                   </p>
 
                   <motion.button
@@ -248,53 +225,6 @@ export default function HomeClient({ bestsellers, featuredProducts }: Props) {
           </div>
         </section>
       )}
-
-      {/* ================= BUNDLES ================= */}
-      <section className="py-24 px-6 max-w-6xl mx-auto">
-        <h2 className="text-2xl md:text-3xl font-semibold mb-12">
-          Curated Bundles
-        </h2>
-
-        <div className="grid md:grid-cols-2 gap-10">
-          {bundles.map((bundle) => (
-            <div
-              key={bundle.id}
-              className="p-6 rounded-2xl border shadow-sm hover:shadow-xl bg-linear-to-br from-white to-pink-50"
-            >
-              <h3 className="text-xl font-semibold">{bundle.name}</h3>
-              <p className="text-black/60 mt-2">{bundle.desc}</p>
-              <p className="mt-4 font-semibold">${bundle.price}</p>
-              <button className="mt-4 bg-linear-to-r from-pink-500 to-purple-600 text-white px-6 py-2 rounded-full">
-                View Bundle
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ================= COMING SOON ================= */}
-      <section className="py-24 px-6 bg-linear-to-r from-pink-500 to-purple-600 text-white text-center">
-        <h2 className="text-4xl font-bold mb-12">Coming Soon</h2>
-
-        <div className="grid md:grid-cols-2 gap-10 max-w-5xl mx-auto">
-          {comingSoon.map((item) => (
-            <div key={item.id}>
-              <Image
-                src={item.image}
-                alt={item.name}
-                width={500}
-                height={350}
-                className="rounded-2xl"
-              />
-              <p className="mt-4 text-xl">{item.name}</p>
-            </div>
-          ))}
-        </div>
-
-        <button className="mt-12 bg-white text-black px-6 py-3 rounded-full">
-          Join Waitlist
-        </button>
-      </section>
 
       {/* ================= CTA ================= */}
       <section className="py-24 text-center">

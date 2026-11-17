@@ -102,7 +102,7 @@ export default function ContactPage() {
               </a>
             </p>
             <p>
-              <span className="font-medium">Phone:</span> +1 876 312 1862
+              <span className="font-medium">Phone:</span>{" "}<a href="tel:+18763121862" className="underline">+1 876 312 1862</a>
             </p>
             <p>
               <span className="font-medium">Location:</span> Montego Bay,

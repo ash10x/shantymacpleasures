@@ -3,6 +3,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/app/context/cartContext";
 import Link from "next/link";
+import Image from "next/image";
+import { formatMoney } from "@/server/lib/money";
 
 export default function MiniCart({
   isOpen,
@@ -53,21 +55,25 @@ export default function MiniCart({
                   Your cart is empty
                 </p>
               ) : (
-                cart.map((item: any) => (
+                cart.map((item) => (
                   <div key={item.id} className="flex gap-3 border-b pb-4">
-                    <img
+                    <Image
                       src={item.image}
+                      alt={item.name}
+                      width={64}
+                      height={64}
                       className="w-16 h-16 rounded-lg object-cover"
                     />
 
                     <div className="flex-1">
                       <p className="text-sm font-medium">{item.name}</p>
-                      <p className="text-xs text-black/60">${item.price}</p>
+                      <p className="text-xs text-black/60">{formatMoney(item.price)}</p>
 
                       {/* QUANTITY */}
                       <div className="flex items-center gap-2 mt-2">
                         <button
                           onClick={() => decreaseQty(item.id)}
+                          aria-label={`Decrease ${item.name} quantity`}
                           className="w-6 h-6 rounded bg-gray-100 hover:bg-pink-100"
                         >
                           -
@@ -77,6 +83,7 @@ export default function MiniCart({
 
                         <button
                           onClick={() => increaseQty(item.id)}
+                          aria-label={`Increase ${item.name} quantity`}
                           className="w-6 h-6 rounded bg-gray-100 hover:bg-pink-100"
                         >
                           +
@@ -87,6 +94,7 @@ export default function MiniCart({
                     {/* REMOVE */}
                     <button
                       onClick={() => removeFromCart(item.id)}
+                      aria-label={`Remove ${item.name} from cart`}
                       className="text-sm hover:text-red-500"
                     >
                       ✕
@@ -100,7 +108,7 @@ export default function MiniCart({
             <div className="mt-6">
               <div className="flex justify-between font-semibold mb-4">
                 <span>Total</span>
-                <span>${total}</span>
+                <span>{formatMoney(total)}</span>
               </div>
 
               {/* CHECKOUT */}

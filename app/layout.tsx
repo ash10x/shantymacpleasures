@@ -10,9 +10,12 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Shantymac Pleasures",
-  description:
-    "A collection of delightful and whimsical pleasures curated by Shantymac.",
+  metadataBase: new URL("https://www.shantymacpleasures.com"),
+  title: { default: "ShantyMac Pleasures | Montego Bay, Jamaica", template: "%s | ShantyMac Pleasures" },
+  description: "Discover a curated collection of intimate products from ShantyMac Pleasures in Montego Bay, Jamaica.",
+  openGraph: { type: "website", siteName: "ShantyMac Pleasures", locale: "en_JM", images: ["/images/about.jpeg"] },
+  twitter: { card: "summary_large_image" },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
   icons: {
     icon: "/logo/logo.png",
   },
