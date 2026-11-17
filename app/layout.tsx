@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import PublicShell from "./components/PublicShell";
 import { CartProvider } from "./context/cartContext";
+import { CurrencyProvider } from "./context/currencyContext";
 import "./globals.css";
 
 const inter = Inter({
@@ -29,11 +30,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        <CartProvider>
-          <PublicShell>
-            {children}
-          </PublicShell>
-        </CartProvider>
+        <CurrencyProvider>
+          <CartProvider>
+            <PublicShell>{children}</PublicShell>
+          </CartProvider>
+        </CurrencyProvider>
       </body>
     </html>
   );

@@ -9,6 +9,8 @@ import { ShoppingCart, Search, Menu, X, ShieldCheck } from "lucide-react";
 import MiniCart from "./miniCart";
 import { useCart } from "@/app/context/cartContext";
 import { searchProducts } from "@/server/actions/getProducts";
+import { useCurrency } from "@/app/context/currencyContext";
+import { formatMoney, FX_RATE_AS_OF, USD_TO_JMD_RATE } from "@/server/lib/money";
 
 function AdminQuickLink() {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -43,6 +45,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { cart } = useCart();
+  const { currency, setCurrency } = useCurrency();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -125,6 +128,25 @@ export default function Navbar() {
   };
 
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+  const currencySwitcher = (
+    <div className="flex flex-col items-center leading-tight">
+    <div className="inline-flex shrink-0 rounded-full border border-pink-200 bg-white/80 p-0.5 text-xs" role="group" aria-label="Display currency">
+      {(["USD", "JMD"] as const).map((code) => (
+        <button
+          key={code}
+          type="button"
+          aria-pressed={currency === code}
+          onClick={() => setCurrency(code)}
+          title={code === "JMD" ? `Approximate conversion at ${USD_TO_JMD_RATE} JMD per USD (rate date ${FX_RATE_AS_OF})` : "Display prices in US dollars"}
+          className={`rounded-full px-2.5 py-1 font-semibold transition ${currency === code ? "bg-pink-600 text-white" : "text-slate-600 hover:text-pink-700"}`}
+        >
+          {code}
+        </button>
+      ))}
+    </div>
+    {currency === "JMD" && <span className="mt-1 whitespace-nowrap text-[9px] text-slate-500">Approx. {USD_TO_JMD_RATE} JMD/USD · {FX_RATE_AS_OF}</span>}
+    </div>
+  );
 
   if (isAdminRoute) return null;
 
@@ -175,6 +197,7 @@ export default function Navbar() {
 
           {/* ACTIONS */}
           <div className="flex items-center gap-5">
+            {currencySwitcher}
             <AdminQuickLink />
             <Search
               onClick={() => setSearchOpen(true)}
@@ -257,7 +280,7 @@ export default function Navbar() {
                       <p className="font-medium text-gray-800 group-hover:text-pink-600 transition truncate">{item.name}</p>
                       <p className="text-xs text-gray-400 mt-0.5">{item.category}</p>
                     </div>
-                    <span className="text-pink-600 font-semibold shrink-0">${item.price}</span>
+                    <span className="text-pink-600 font-semibold shrink-0">{formatMoney(item.price, currency)}</span>
                   </button>
                 ))}
               </div>
@@ -281,6 +304,10 @@ export default function Navbar() {
             <X onClick={() => setMenuOpen(false)} />
 
             <div className="mt-10 flex flex-col gap-6 text-lg font-medium">
+              <div className="flex items-center gap-3 text-sm">
+                <span>Display currency</span>
+                {currencySwitcher}
+              </div>
               {navLinks.map((link) => (
                 <Link key={link.name} href={link.href}>
                   {link.name}

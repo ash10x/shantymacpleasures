@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { products } from "@/server/schema";
 import { formatMoney } from "@/server/lib/money";
+import { useCurrency } from "@/app/context/currencyContext";
 
 type Product = typeof products.$inferSelect;
 
@@ -19,6 +20,7 @@ interface Props {
 
 export default function ShopClient({ products, categories }: Props) {
   const { addToCart } = useCart();
+  const { currency } = useCurrency();
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -124,7 +126,7 @@ export default function ShopClient({ products, categories }: Props) {
                 </h2>
               </Link>
               <p className="text-lg font-bold bg-linear-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                {formatMoney(product.price)}
+                {formatMoney(product.price, currency)}
               </p>
 
               {/* BUTTON */}

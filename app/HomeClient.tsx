@@ -7,6 +7,7 @@ import { useCart } from "@/app/context/cartContext";
 import { useState } from "react";
 import type { products } from "@/server/schema";
 import { formatMoney } from "@/server/lib/money";
+import { useCurrency } from "@/app/context/currencyContext";
 
 type Product = typeof products.$inferSelect;
 
@@ -17,6 +18,7 @@ interface Props {
 
 export default function HomeClient({ bestsellers, featuredProducts }: Props) {
   const { addToCart } = useCart();
+  const { currency } = useCurrency();
   const [addedId, setAddedId] = useState<number | null>(null);
 
   const { scrollY } = useScroll();
@@ -148,7 +150,7 @@ export default function HomeClient({ bestsellers, featuredProducts }: Props) {
                   </h3>
                   <div className="mt-2 flex items-center justify-between">
                     <p className="text-xl font-bold bg-linear-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                      {formatMoney(item.price)}
+                      {formatMoney(item.price, currency)}
                     </p>
                     <span className="text-sm font-medium text-pink-600 group-hover:translate-x-1 transition-transform inline-block">
                       View Product →
@@ -203,7 +205,7 @@ export default function HomeClient({ bestsellers, featuredProducts }: Props) {
                   </Link>
                   <p className="mt-1 text-xs text-gray-400 uppercase tracking-wider">{product.category}</p>
                   <p className="mt-2 text-lg font-bold bg-linear-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                  {formatMoney(product.price)}
+                  {formatMoney(product.price, currency)}
                   </p>
 
                   <motion.button

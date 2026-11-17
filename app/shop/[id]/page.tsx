@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getProductById } from "../../../server/actions/getProducts";
 import AddToCartButton from "./AddToCartButton";
-import { formatMoney } from "@/server/lib/money";
+import ProductPrice from "./ProductPrice";
 import type { Metadata } from "next";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
@@ -63,7 +63,7 @@ export default async function ProductPage({
               {product.description}
             </p>
             <p className="mt-6 text-2xl font-bold bg-linear-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-              {formatMoney(product.price)}
+              <ProductPrice minorUnits={product.price} />
             </p>
             <p className="mt-1 text-xs text-gray-400">
               {product.quantity > 0 ? `${product.quantity} in stock` : "Out of stock"}

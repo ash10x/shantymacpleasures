@@ -6,7 +6,8 @@ import { useCart } from "../context/cartContext";
 import { placeOrder, validateCoupon } from "@/server/actions/addOrder";
 import { motion } from "framer-motion";
 import { Loader2, Tag, Check, AlertCircle } from "lucide-react";
-import { formatMoney } from "@/server/lib/money";
+import { formatMoney, USD_TO_JMD_RATE } from "@/server/lib/money";
+import { useCurrency } from "@/app/context/currencyContext";
 
 function getErrMsg(e: unknown) {
   return e instanceof Error ? e.message : "Something went wrong.";
@@ -14,6 +15,7 @@ function getErrMsg(e: unknown) {
 
 export default function CheckoutPage() {
   const { cart, clearCart } = useCart();
+  const { currency } = useCurrency();
   const router = useRouter();
 
   const [form, setForm] = useState({
@@ -50,7 +52,7 @@ export default function CheckoutPage() {
         const result = await validateCoupon(couponCode, subtotal);
         setDiscount(result.discount);
         setCouponMsg({
-          text: `Coupon applied! You save ${formatMoney(result.discount)}`,
+          text: `Coupon applied! You save ${formatMoney(result.discount, currency)}`,
           ok: true,
         });
       } catch (e) {
@@ -211,6 +213,7 @@ export default function CheckoutPage() {
           animate={{ opacity: 1, x: 0 }}
         >
           <h2 className="text-2xl font-semibold mb-6">Your Order</h2>
+          {currency === "JMD" && <p className="-mt-3 mb-4 text-xs text-slate-500">JMD figures are estimates at JMD {USD_TO_JMD_RATE} per USD 1. Order amounts are recorded in USD.</p>}
 
           {cart.length === 0 ? (
             <p className="text-black/60">Your cart is empty.</p>
@@ -222,24 +225,24 @@ export default function CheckoutPage() {
                     {item.name} × {item.quantity}
                   </span>
                   <span>
-                    {formatMoney(item.price * item.quantity)}
+                    {formatMoney(item.price * item.quantity, currency)}
                   </span>
                 </div>
               ))}
               <div className="border-t pt-4 space-y-2">
                 <div className="flex justify-between text-sm text-black/60">
                   <span>Subtotal</span>
-                  <span>{formatMoney(subtotal)}</span>
+                  <span>{formatMoney(subtotal, currency)}</span>
                 </div>
                 {discount > 0 && (
                   <div className="flex justify-between text-sm text-green-600 font-medium">
                     <span>Discount</span>
-                    <span>−{formatMoney(discount)}</span>
+                    <span>−{formatMoney(discount, currency)}</span>
                   </div>
                 )}
                 <div className="flex justify-between font-semibold text-lg">
                   <span>Total</span>
-                  <span>{formatMoney(grandTotal)}</span>
+                  <span>{formatMoney(grandTotal, currency)}</span>
                 </div>
               </div>
             </div>
