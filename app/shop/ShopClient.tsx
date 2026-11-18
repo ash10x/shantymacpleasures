@@ -181,8 +181,8 @@ export default function ShopClient({ products, categories, initialCategory = "Al
               Explore the collection <ArrowRight size={15} aria-hidden="true" className="transition-transform group-hover:translate-x-1" />
             </a>
           </div>
-          <div className="relative min-h-[250px] sm:min-h-[330px] md:min-h-full">
-            <Image src="/images/bg1.jpg" alt="ShantyMac Pleasures collection hero" fill priority sizes="(max-width: 768px) 100vw, 55vw" className="object-cover object-[62%_center]" />
+          <div className="relative aspect-[2/1] w-full self-center bg-[#eee8df]">
+            <Image src="/images/shop-hero.png" alt="Purple and fuchsia intimate accessories arranged with flowers, satin, and candlelight" fill priority sizes="(max-width: 768px) 100vw, 55vw" className="object-contain" />
           </div>
         </div>
       </section>
