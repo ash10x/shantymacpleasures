@@ -182,7 +182,7 @@ export default function ShopClient({ products, categories, initialCategory = "Al
             </a>
           </div>
           <div className="relative min-h-[250px] sm:min-h-[330px] md:min-h-full">
-            <Image src="/images/shop-editorial.webp" alt="Warm studio still life with burgundy calla lilies, a ceramic vase, and champagne silk" fill priority sizes="(max-width: 768px) 100vw, 55vw" className="object-cover object-[62%_center]" />
+            <Image src="/images/bg1.jpg" alt="ShantyMac Pleasures collection hero" fill priority sizes="(max-width: 768px) 100vw, 55vw" className="object-cover object-[62%_center]" />
           </div>
         </div>
       </section>

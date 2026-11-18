@@ -29,12 +29,12 @@ export default function HomeClient({ featuredProducts, categories }: { featuredP
   };
 
   return <main className="overflow-hidden bg-[#faf8f5] text-[#2b1238]">
-    <section className="relative min-h-[680px] bg-[#2b1238] text-[#fbf7f1] lg:min-h-[740px]">
-      <div className="absolute inset-0 lg:left-[38%]">
-        <Image src="/images/shop-editorial.webp" alt="An intimate, softly lit luxury bedroom in warm neutral tones" fill priority sizes="(max-width: 1024px) 100vw, 62vw" className="object-cover object-center opacity-80" />
+    <section className="relative bg-[#2b1238] text-[#fbf7f1] lg:min-h-[740px]">
+      <div className="relative aspect-[16/9] w-full lg:absolute lg:inset-0 lg:aspect-auto">
+        <Image src="/images/landing-hero.png" alt="A woman in lavender lingerie reclining in a warmly lit boudoir, with intimate accessories nearby" fill priority sizes="100vw" className="object-cover object-center opacity-90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#2b1238] lg:bg-gradient-to-r lg:from-[#2b1238]/95 lg:via-[#2b1238]/65 lg:via-45% lg:to-[#2b1238]/10" />
       </div>
-      <div className="absolute inset-0 bg-gradient-to-r from-[#2b1238] via-[#2b1238]/90 to-[#2b1238]/25 lg:bg-gradient-to-r lg:from-[#2b1238] lg:via-[#2b1238]/95 lg:via-45% lg:to-transparent" />
-      <div className="relative mx-auto flex min-h-[680px] max-w-7xl items-center px-6 py-28 lg:min-h-[740px] lg:px-10">
+      <div className="relative mx-auto flex max-w-7xl items-center px-6 py-3 lg:min-h-[740px] lg:px-10 lg:py-28">
         <motion.div {...(reduceMotion ? {} : { initial: { opacity: 0, y: 24 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.8 } })} className="max-w-xl">
           <p className="text-xs uppercase tracking-[0.32em] text-[#ff78c4]">Montego Bay · Jamaica</p>
           <h1 className="mt-6 font-serif text-5xl leading-[1.08] tracking-tight sm:text-6xl lg:text-7xl">Pleasure,<br /><span className="italic text-[#ff78c4]">reimagined.</span></h1>
@@ -43,7 +43,7 @@ export default function HomeClient({ featuredProducts, categories }: { featuredP
           <p className="mt-12 text-xs tracking-wide text-white/55">Thoughtfully selected. Always personal.</p>
         </motion.div>
       </div>
-      <div className="pointer-events-none absolute bottom-0 h-24 w-full bg-gradient-to-t from-[#faf8f5] to-transparent" />
+      <div className="pointer-events-none absolute bottom-0 z-10 h-12 w-full bg-gradient-to-t from-[#faf8f5] to-transparent lg:h-24" />
     </section>
 
     <section className="mx-auto grid max-w-7xl gap-8 px-6 py-20 md:grid-cols-[1fr_1.3fr] md:items-end md:px-10 md:py-28">
