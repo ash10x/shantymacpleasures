@@ -26,7 +26,7 @@ function AdminQuickLink() {
   return (
     <Link
       href="/admin/dashboard"
-      className="flex items-center gap-1.5 rounded-full border border-pink-200 bg-pink-50 px-3 py-1 text-xs font-semibold text-pink-600 transition hover:bg-pink-100"
+      className="flex items-center gap-1.5 rounded-full border border-[#e8c4df] bg-[#faeaf3] px-3 py-1 text-xs font-semibold text-[#76227e] transition hover:bg-[#f4dfef]"
     >
       <ShieldCheck size={13} />
       Admin
@@ -130,7 +130,7 @@ export default function Navbar() {
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
   const currencySwitcher = (
     <div className="flex flex-col items-center leading-tight">
-    <div className="inline-flex shrink-0 rounded-full border border-pink-200 bg-white/80 p-0.5 text-xs" role="group" aria-label="Display currency">
+    <div className="inline-flex shrink-0 rounded-full border border-[#d7bbd7] bg-white/80 p-0.5 text-xs" role="group" aria-label="Display currency">
       {(["USD", "JMD"] as const).map((code) => (
         <button
           key={code}
@@ -138,7 +138,7 @@ export default function Navbar() {
           aria-pressed={currency === code}
           onClick={() => setCurrency(code)}
           title={code === "JMD" ? `Approximate conversion at ${USD_TO_JMD_RATE} JMD per USD (rate date ${FX_RATE_AS_OF})` : "Display prices in US dollars"}
-          className={`rounded-full px-2.5 py-1 font-semibold transition ${currency === code ? "bg-pink-600 text-white" : "text-slate-600 hover:text-pink-700"}`}
+          className={`rounded-full px-2.5 py-1 font-semibold transition ${currency === code ? "bg-[#2b1238] text-white" : "text-slate-600 hover:text-[#662071]"}`}
         >
           {code}
         </button>
@@ -155,19 +155,13 @@ export default function Navbar() {
       <nav
         className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
           scrolled
-            ? "py-2 bg-white/80 backdrop-blur-xl shadow-lg"
-            : "py-4 bg-white/60 backdrop-blur-md"
+            ? "py-2 bg-[#faf8f5]/95 backdrop-blur-xl shadow-sm"
+            : "py-3 bg-[#faf8f5]/85 backdrop-blur-md"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
           {/* LOGO */}
-          <Image
-            src="/logo/logo.png"
-            alt="Velvet"
-            width={90}
-            height={90}
-            className="object-contain"
-          />
+          <Link href="/" aria-label="ShantyMac Pleasures home" className="shrink-0"><Image src="/logo/logo.png" alt="ShantyMac Pleasures" width={72} height={72} className="object-contain" /></Link>
 
           {/* DESKTOP LINKS */}
           <div className="hidden md:flex gap-8">
@@ -177,18 +171,18 @@ export default function Navbar() {
               return (
                 <Link key={link.name} href={link.href}>
                   <div className="relative group cursor-pointer text-sm font-semibold tracking-wide">
-                    <span className="text-gray-700 group-hover:text-black transition">
+                      <span className="text-[#51463e] group-hover:text-[#2b1238] transition">
                       {link.name}
                     </span>
 
                     {active && (
                       <motion.div
                         layoutId="pill"
-                        className="absolute -bottom-2 left-0 right-0 h-0.75 bg-pink-500 rounded-full"
+                        className="absolute -bottom-2 left-0 right-0 h-0.75 bg-[#76227e] rounded-full"
                       />
                     )}
 
-                    <span className="absolute left-0 -bottom-2 h-0.75 w-0 bg-pink-400 group-hover:w-full transition-all duration-300" />
+                    <span className="absolute left-0 -bottom-2 h-0.75 w-0 bg-[#76227e] group-hover:w-full transition-all duration-300" />
                   </div>
                 </Link>
               );
@@ -199,26 +193,20 @@ export default function Navbar() {
           <div className="flex items-center gap-5">
             {currencySwitcher}
             <AdminQuickLink />
-            <Search
-              onClick={() => setSearchOpen(true)}
-              className="cursor-pointer hover:scale-110 transition"
-            />
+            <button type="button" onClick={() => setSearchOpen(true)} className="rounded-full p-2 hover:bg-black/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#662071]" aria-label="Search products"><Search size={19} /></button>
 
             {/* CART ICON */}
-            <div
-              onClick={() => setCartOpen(true)}
-              className="relative cursor-pointer hover:scale-110 transition"
-            >
-              <ShoppingCart />
+            <button type="button" onClick={() => setCartOpen(true)} className="relative rounded-full p-2 hover:bg-black/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#662071]" aria-label={`Open shopping bag${cartCount ? `, ${cartCount} items` : ""}`}>
+              <ShoppingCart size={19} />
 
               {cartCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                <span className="absolute -right-1 -top-1 rounded-full bg-[#662071] px-1.5 py-0.5 text-xs text-white">
                   {cartCount}
                 </span>
               )}
-            </div>
+            </button>
 
-            <Menu onClick={() => setMenuOpen(true)} className="md:hidden" />
+            <button type="button" onClick={() => setMenuOpen(true)} className="rounded-full p-2 hover:bg-black/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#662071] md:hidden" aria-label="Open navigation menu"><Menu size={20} /></button>
           </div>
         </div>
       </nav>
@@ -265,10 +253,10 @@ export default function Navbar() {
                   <button
                     key={item.id}
                     onClick={() => handleResultClick(item.id)}
-                    className="w-full flex items-center gap-3 p-3 hover:bg-pink-50 rounded-xl cursor-pointer transition text-left group"
+                    className="w-full flex items-center gap-3 p-3 hover:bg-[#faeaf3] rounded-xl cursor-pointer transition text-left group"
                   >
                     {/* Thumbnail */}
-                    <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-pink-50 shrink-0">
+                    <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-[#faeaf3] shrink-0">
                       <Image
                         src={item.image}
                         alt={item.name}
@@ -277,10 +265,10 @@ export default function Navbar() {
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-800 group-hover:text-pink-600 transition truncate">{item.name}</p>
+                      <p className="font-medium text-gray-800 group-hover:text-[#76227e] transition truncate">{item.name}</p>
                       <p className="text-xs text-gray-400 mt-0.5">{item.category}</p>
                     </div>
-                    <span className="text-pink-600 font-semibold shrink-0">{formatMoney(item.price, currency)}</span>
+                    <span className="text-[#76227e] font-semibold shrink-0">{formatMoney(item.price, currency)}</span>
                   </button>
                 ))}
               </div>

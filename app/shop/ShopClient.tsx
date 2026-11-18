@@ -18,14 +18,15 @@ const ITEMS_PER_PAGE = 12;
 interface Props {
   products: Product[];
   categories: string[];
+  initialCategory?: string;
 }
 
-export default function ShopClient({ products, categories }: Props) {
+export default function ShopClient({ products, categories, initialCategory = "All" }: Props) {
   const { addToCart } = useCart();
   const { currency } = useCurrency();
   const reduceMotion = useReducedMotion();
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("All");
+  const [category, setCategory] = useState(initialCategory);
   const [availability, setAvailability] = useState<Availability>("all");
   const [sortMode, setSortMode] = useState<SortMode>("featured");
   const [minPrice, setMinPrice] = useState("");
@@ -169,14 +170,14 @@ export default function ShopClient({ products, categories }: Props) {
   );
 
   return (
-    <main className="min-h-screen bg-[#f8f6f1] pb-24 text-[#25211e]">
+    <main className="min-h-screen bg-[#f8f6f1] pb-24 text-[#2b1238]">
       <section className="mx-auto max-w-[1440px] px-4 pt-28 sm:px-8 lg:px-12 lg:pt-32">
         <div className="grid min-h-[390px] overflow-hidden bg-[#eee8df] md:grid-cols-[0.92fr_1.08fr] lg:min-h-[500px]">
           <div className="flex flex-col items-start justify-center px-7 py-12 sm:px-12 lg:px-16 lg:py-16">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#a45168]">The ShantyMac Collection</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#8d287b]">The ShantyMac Collection</p>
             <h1 className="mt-5 max-w-xl font-serif text-5xl leading-[1.02] tracking-[-0.035em] text-[#2e2824] sm:text-6xl lg:text-7xl">Discover your pleasure.</h1>
             <p className="mt-6 max-w-md text-sm leading-7 text-[#625952] sm:text-base">An elevated collection of intimate essentials, thoughtfully curated to celebrate confidence, comfort, and personal wellness.</p>
-            <a href="#collection" className="group mt-8 inline-flex items-center gap-3 border-b border-[#a45168] pb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#713b4d] transition-colors hover:text-[#a45168] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#a45168]">
+            <a href="#collection" className="group mt-8 inline-flex items-center gap-3 border-b border-[#8d287b] pb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#5b1a68] transition-colors hover:text-[#8d287b] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8d287b]">
               Explore the collection <ArrowRight size={15} aria-hidden="true" className="transition-transform group-hover:translate-x-1" />
             </a>
           </div>
@@ -188,14 +189,14 @@ export default function ShopClient({ products, categories }: Props) {
 
       <section className="mx-auto max-w-[1440px] px-4 pt-12 sm:px-8 lg:px-12 lg:pt-16" aria-label="Browse product categories">
         <div className="flex items-end justify-between gap-4 border-b border-[#d9d2c8] pb-4">
-          <div><p className="text-[10px] uppercase tracking-[0.22em] text-[#a45168]">Find your fit</p><h2 className="mt-2 font-serif text-2xl sm:text-3xl">Browse by category</h2></div>
+          <div><p className="text-[10px] uppercase tracking-[0.22em] text-[#8d287b]">Find your fit</p><h2 className="mt-2 font-serif text-2xl sm:text-3xl">Browse by category</h2></div>
           <span className="hidden text-xs text-stone-500 sm:block">{categories.length} {categories.length === 1 ? "category" : "categories"}</span>
         </div>
         <div className="-mx-4 flex gap-2 overflow-x-auto px-4 py-4 sm:mx-0 sm:flex-wrap sm:px-0" role="group" aria-label="Filter by category">
           {["All", ...categories].map((name) => {
             const count = name === "All" ? products.length : products.filter((item) => item.category === name).length;
             const active = category === name;
-            return <button key={name} type="button" aria-pressed={active} onClick={() => selectCategory(name)} className={`flex shrink-0 items-center gap-2 border-b-2 px-3 py-2.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a45168] ${active ? "border-[#a45168] text-[#713b4d]" : "border-transparent text-stone-600 hover:border-stone-400 hover:text-stone-900"}`}>
+            return <button key={name} type="button" aria-pressed={active} onClick={() => selectCategory(name)} className={`flex shrink-0 items-center gap-2 border-b-2 px-3 py-2.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8d287b] ${active ? "border-[#8d287b] text-[#5b1a68]" : "border-transparent text-stone-600 hover:border-stone-400 hover:text-stone-900"}`}>
               <span>{name}</span><span className="text-[10px] tabular-nums text-stone-400">{count}</span>
             </button>;
           })}
@@ -204,14 +205,14 @@ export default function ShopClient({ products, categories }: Props) {
 
       <section id="collection" className="mx-auto max-w-[1440px] scroll-mt-24 px-4 pt-10 sm:px-8 lg:px-12 lg:pt-14">
         <div className="flex flex-wrap items-end justify-between gap-5 border-b border-[#d9d2c8] pb-5">
-          <div><p className="text-[10px] uppercase tracking-[0.22em] text-[#a45168]">Thoughtfully selected</p><h2 className="mt-2 font-serif text-3xl sm:text-4xl">The collection</h2></div>
+          <div><p className="text-[10px] uppercase tracking-[0.22em] text-[#8d287b]">Thoughtfully selected</p><h2 className="mt-2 font-serif text-3xl sm:text-4xl">The collection</h2></div>
           <div className="flex items-center gap-3 text-sm text-stone-600"><span aria-live="polite">{filteredProducts.length} {filteredProducts.length === 1 ? "piece" : "pieces"}</span><span aria-hidden="true" className="text-stone-300">/</span>
-            <label className="flex items-center gap-2"><ArrowDownWideNarrow size={15} aria-hidden="true"/><span className="sr-only">Sort products</span><select value={sortMode} onChange={(event) => { setSortMode(event.target.value as SortMode); setPage(1); }} className="bg-transparent py-2 text-sm text-stone-700 outline-none focus-visible:ring-2 focus-visible:ring-[#a45168]"><option value="featured">Featured</option><option value="price-asc">Price: low to high</option><option value="price-desc">Price: high to low</option></select></label>
+            <label className="flex items-center gap-2"><ArrowDownWideNarrow size={15} aria-hidden="true"/><span className="sr-only">Sort products</span><select value={sortMode} onChange={(event) => { setSortMode(event.target.value as SortMode); setPage(1); }} className="bg-transparent py-2 text-sm text-stone-700 outline-none focus-visible:ring-2 focus-visible:ring-[#8d287b]"><option value="featured">Featured</option><option value="price-asc">Price: low to high</option><option value="price-desc">Price: high to low</option></select></label>
           </div>
         </div>
 
         <div className="flex items-center gap-3 border-b border-[#e2ddd5] py-3 md:hidden">
-          <button type="button" onClick={(event) => { returnFocusRef.current = event.currentTarget; setFiltersOpen(true); }} className="inline-flex h-10 items-center gap-2 border border-[#d9d2c8] px-3 text-xs font-semibold uppercase tracking-[0.12em] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a45168]"><Filter size={15} aria-hidden="true"/> Filters {hasFilters && <span className="h-1.5 w-1.5 rounded-full bg-[#a45168]"/>}</button>
+          <button type="button" onClick={(event) => { returnFocusRef.current = event.currentTarget; setFiltersOpen(true); }} className="inline-flex h-10 items-center gap-2 border border-[#d9d2c8] px-3 text-xs font-semibold uppercase tracking-[0.12em] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8d287b]"><Filter size={15} aria-hidden="true"/> Filters {hasFilters && <span className="h-1.5 w-1.5 rounded-full bg-[#8d287b]"/>}</button>
           {hasFilters && <button type="button" onClick={clearFilters} className="text-xs text-stone-500 underline underline-offset-4">Clear all</button>}
         </div>
         <div className="hidden items-center gap-6 border-b border-[#e2ddd5] py-2 md:flex">{filterFields}{hasFilters && <button type="button" onClick={clearFilters} className="shrink-0 text-xs text-stone-500 underline underline-offset-4 hover:text-stone-900">Clear all</button>}</div>
@@ -221,22 +222,22 @@ export default function ShopClient({ products, categories }: Props) {
             {currentProducts.map((product) => (
               <article key={product.id} className="group min-w-0">
                 <div className="relative aspect-[4/5] overflow-hidden bg-[#eeeae3]">
-                  <Link href={`/shop/${product.id}`} aria-label={`View ${product.name}`} className="absolute inset-0 z-[1] focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#a45168]">
+                  <Link href={`/shop/${product.id}`} aria-label={`View ${product.name}`} className="absolute inset-0 z-[1] focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#8d287b]">
                     <Image src={product.image} alt={product.imageAlt?.trim() || product.name} fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" loading="lazy" className="object-contain p-4 transition-transform duration-500 ease-out group-hover:scale-[1.035] motion-reduce:transition-none" />
                   </Link>
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 motion-reduce:transition-none" />
-                  {product.featured && <span className="absolute left-2 top-2 z-[2] bg-[#f8f6f1]/95 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#713b4d] sm:left-3 sm:top-3 sm:px-2.5">Featured</span>}
-                  {product.quantity === 0 && <span className="absolute bottom-2 left-2 z-[2] bg-[#25211e]/90 px-2 py-1 text-[9px] font-medium uppercase tracking-[0.12em] text-white sm:bottom-3 sm:left-3">Sold out</span>}
-                  {product.quantity > 0 && product.quantity <= 3 && <span className="absolute bottom-2 left-2 z-[2] bg-[#f8f6f1]/95 px-2 py-1 text-[9px] font-medium uppercase tracking-[0.1em] text-[#713b4d] sm:bottom-3 sm:left-3">Only {product.quantity} left</span>}
-                  <button type="button" onClick={() => openQuickView(product)} className="absolute bottom-2 right-2 z-[3] bg-[#f8f6f1]/95 px-2.5 py-2 text-[9px] font-semibold uppercase tracking-[0.12em] text-[#302923] transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a45168] sm:bottom-3 sm:right-3 sm:px-3 sm:text-[10px]">Quick view</button>
+                  {product.featured && <span className="absolute left-2 top-2 z-[2] bg-[#f8f6f1]/95 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#5b1a68] sm:left-3 sm:top-3 sm:px-2.5">Featured</span>}
+                  {product.quantity === 0 && <span className="absolute bottom-2 left-2 z-[2] bg-[#2b1238]/90 px-2 py-1 text-[9px] font-medium uppercase tracking-[0.12em] text-white sm:bottom-3 sm:left-3">Sold out</span>}
+                  {product.quantity > 0 && product.quantity <= 3 && <span className="absolute bottom-2 left-2 z-[2] bg-[#f8f6f1]/95 px-2 py-1 text-[9px] font-medium uppercase tracking-[0.1em] text-[#5b1a68] sm:bottom-3 sm:left-3">Only {product.quantity} left</span>}
+                  <button type="button" onClick={() => openQuickView(product)} className="absolute bottom-2 right-2 z-[3] bg-[#f8f6f1]/95 px-2.5 py-2 text-[9px] font-semibold uppercase tracking-[0.12em] text-[#2b1238] transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8d287b] sm:bottom-3 sm:right-3 sm:px-3 sm:text-[10px]">Quick view</button>
                 </div>
                 <div className="pt-3 sm:pt-4">
                   <p className="truncate text-[9px] uppercase tracking-[0.16em] text-stone-500 sm:text-[10px]">{product.category}</p>
-                  <Link href={`/shop/${product.id}`} className="mt-1 block"><h3 className="line-clamp-2 min-h-10 font-serif text-base leading-snug text-[#2e2824] transition-colors group-hover:text-[#713b4d] sm:text-lg">{product.name}</h3></Link>
-                  <div className="mt-1 flex flex-wrap items-center justify-between gap-x-2 gap-y-1"><p className="text-sm font-medium tabular-nums text-[#302923] sm:text-base">{formatMoney(product.price, currency)}</p><span className={`text-[9px] uppercase tracking-[0.1em] ${product.quantity > 0 ? "text-stone-500" : "text-stone-400"}`}>{product.quantity > 0 ? "In stock" : "Unavailable"}</span></div>
+                  <Link href={`/shop/${product.id}`} className="mt-1 block"><h3 className="line-clamp-2 min-h-10 font-serif text-base leading-snug text-[#2e2824] transition-colors group-hover:text-[#5b1a68] sm:text-lg">{product.name}</h3></Link>
+                  <div className="mt-1 flex flex-wrap items-center justify-between gap-x-2 gap-y-1"><p className="text-sm font-medium tabular-nums text-[#2b1238] sm:text-base">{formatMoney(product.price, currency)}</p><span className={`text-[9px] uppercase tracking-[0.1em] ${product.quantity > 0 ? "text-stone-500" : "text-stone-400"}`}>{product.quantity > 0 ? "In stock" : "Unavailable"}</span></div>
                   <div className="mt-3 flex items-center gap-3">
-                    <button type="button" disabled={product.quantity <= 0} onClick={() => addProduct(product)} className="min-h-10 flex-1 border border-[#392f29] px-2 text-[9px] font-semibold uppercase tracking-[0.12em] text-[#302923] transition-colors hover:bg-[#302923] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a45168] disabled:cursor-not-allowed disabled:border-stone-300 disabled:text-stone-400 disabled:hover:bg-transparent disabled:hover:text-stone-400 sm:text-[10px]">{addedProductId === product.id ? <span className="inline-flex items-center gap-1"><Check size={13}/> Added</span> : product.quantity > 0 ? "Add to bag" : "Sold out"}</button>
-                    <Link href={`/shop/${product.id}`} className="hidden text-[10px] uppercase tracking-[0.12em] text-stone-500 underline-offset-4 hover:text-stone-900 hover:underline focus-visible:outline-2 focus-visible:outline-[#a45168] sm:inline">Details</Link>
+                    <button type="button" disabled={product.quantity <= 0} onClick={() => addProduct(product)} className="min-h-10 flex-1 border border-[#662071] px-2 text-[9px] font-semibold uppercase tracking-[0.12em] text-[#2b1238] transition-colors hover:bg-[#2b1238] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8d287b] disabled:cursor-not-allowed disabled:border-stone-300 disabled:text-stone-400 disabled:hover:bg-transparent disabled:hover:text-stone-400 sm:text-[10px]">{addedProductId === product.id ? <span className="inline-flex items-center gap-1"><Check size={13}/> Added</span> : product.quantity > 0 ? "Add to bag" : "Sold out"}</button>
+                    <Link href={`/shop/${product.id}`} className="hidden text-[10px] uppercase tracking-[0.12em] text-stone-500 underline-offset-4 hover:text-stone-900 hover:underline focus-visible:outline-2 focus-visible:outline-[#8d287b] sm:inline">Details</Link>
                   </div>
                 </div>
               </article>
@@ -244,16 +245,16 @@ export default function ShopClient({ products, categories }: Props) {
           </div>
         ) : (
           <div className="mx-auto max-w-xl py-20 text-center sm:py-28">
-            <p className="text-[10px] uppercase tracking-[0.22em] text-[#a45168]">A fresh start</p>
+            <p className="text-[10px] uppercase tracking-[0.22em] text-[#8d287b]">A fresh start</p>
             <h3 className="mt-3 font-serif text-3xl">{products.length ? "No pieces match your search" : "The collection is being refreshed"}</h3>
             <p className="mt-3 text-sm leading-6 text-stone-600">{products.length ? "Try another search or clear your filters to explore the full collection." : "Please check back soon, or contact us for help finding something."}</p>
-            {products.length ? <button type="button" onClick={clearFilters} className="mt-6 border-b border-[#a45168] pb-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#713b4d]">Clear filters</button> : <Link href="/contact" className="mt-6 inline-block border-b border-[#a45168] pb-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#713b4d]">Contact us</Link>}
+            {products.length ? <button type="button" onClick={clearFilters} className="mt-6 border-b border-[#8d287b] pb-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#5b1a68]">Clear filters</button> : <Link href="/contact" className="mt-6 inline-block border-b border-[#8d287b] pb-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#5b1a68]">Contact us</Link>}
           </div>
         )}
 
         {totalPages > 1 && <nav aria-label="Product pages" className="mt-14 flex items-center justify-center gap-2">
           <button type="button" disabled={page <= 1} onClick={() => { setPage((value) => Math.max(1, value - 1)); document.getElementById("collection")?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" }); }} className="min-h-10 px-3 text-xs uppercase tracking-[0.12em] text-stone-600 disabled:opacity-40">Previous</button>
-          {Array.from({ length: totalPages }, (_, index) => index + 1).map((number) => <button key={number} type="button" aria-current={number === page ? "page" : undefined} onClick={() => setPage(number)} className={`h-10 min-w-10 border text-xs transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a45168] ${number === page ? "border-[#302923] bg-[#302923] text-white" : "border-[#d9d2c8] text-stone-700 hover:border-[#302923]"}`}>{number}</button>)}
+          {Array.from({ length: totalPages }, (_, index) => index + 1).map((number) => <button key={number} type="button" aria-current={number === page ? "page" : undefined} onClick={() => setPage(number)} className={`h-10 min-w-10 border text-xs transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8d287b] ${number === page ? "border-[#2b1238] bg-[#2b1238] text-white" : "border-[#d9d2c8] text-stone-700 hover:border-[#2b1238]"}`}>{number}</button>)}
           <button type="button" disabled={page >= totalPages} onClick={() => { setPage((value) => Math.min(totalPages, value + 1)); document.getElementById("collection")?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" }); }} className="min-h-10 px-3 text-xs uppercase tracking-[0.12em] text-stone-600 disabled:opacity-40">Next</button>
         </nav>}
       </section>
@@ -261,9 +262,9 @@ export default function ShopClient({ products, categories }: Props) {
       <AnimatePresence>
         {filtersOpen && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduceMotion ? 0 : 0.18 }} className="fixed inset-0 z-[70] bg-black/35 md:hidden" onMouseDown={(event) => { if (event.target === event.currentTarget) setFiltersOpen(false); }}>
           <motion.section data-shop-dialog role="dialog" aria-modal="true" aria-labelledby="mobile-filters-title" initial={{ y: reduceMotion ? 0 : "100%" }} animate={{ y: 0 }} exit={{ y: reduceMotion ? 0 : "100%" }} transition={{ duration: reduceMotion ? 0 : 0.24 }} className="absolute inset-x-0 bottom-0 bg-[#f8f6f1] px-5 pb-8 pt-5 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-[#d9d2c8] pb-4"><h2 id="mobile-filters-title" className="font-serif text-2xl">Refine the collection</h2><button ref={closeFiltersRef} type="button" onClick={() => setFiltersOpen(false)} aria-label="Close filters" className="p-2 focus-visible:outline-2 focus-visible:outline-[#a45168]"><X size={20}/></button></div>
+            <div className="flex items-center justify-between border-b border-[#d9d2c8] pb-4"><h2 id="mobile-filters-title" className="font-serif text-2xl">Refine the collection</h2><button ref={closeFiltersRef} type="button" onClick={() => setFiltersOpen(false)} aria-label="Close filters" className="p-2 focus-visible:outline-2 focus-visible:outline-[#8d287b]"><X size={20}/></button></div>
             <div className="flex flex-col gap-3 py-4">{filterFields}<label className="flex items-center gap-2 border-b border-[#d9d2c8] py-3 text-xs uppercase tracking-[0.12em] text-stone-500">Category<select value={category} onChange={(event) => { selectCategory(event.target.value); }} className="ml-auto max-w-48 bg-transparent py-2 text-sm normal-case tracking-normal text-stone-800"><option>All</option>{categories.map((name) => <option key={name}>{name}</option>)}</select></label></div>
-            <div className="flex gap-3"><button type="button" onClick={clearFilters} className="min-h-12 flex-1 border border-[#302923] text-xs font-semibold uppercase tracking-[0.12em]">Clear all</button><button type="button" onClick={() => setFiltersOpen(false)} className="min-h-12 flex-1 bg-[#302923] text-xs font-semibold uppercase tracking-[0.12em] text-white">Show {filteredProducts.length} results</button></div>
+            <div className="flex gap-3"><button type="button" onClick={clearFilters} className="min-h-12 flex-1 border border-[#2b1238] text-xs font-semibold uppercase tracking-[0.12em]">Clear all</button><button type="button" onClick={() => setFiltersOpen(false)} className="min-h-12 flex-1 bg-[#2b1238] text-xs font-semibold uppercase tracking-[0.12em] text-white">Show {filteredProducts.length} results</button></div>
           </motion.section>
         </motion.div>}
       </AnimatePresence>
@@ -271,13 +272,13 @@ export default function ShopClient({ products, categories }: Props) {
       <AnimatePresence>
         {quickView && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduceMotion ? 0 : 0.18 }} className="fixed inset-0 z-[80] flex items-center justify-center bg-black/45 p-3 sm:p-6" onMouseDown={(event) => { if (event.target === event.currentTarget) setQuickView(null); }}>
           <motion.section data-shop-dialog role="dialog" aria-modal="true" aria-labelledby="quick-view-title" initial={{ opacity: 0, y: reduceMotion ? 0 : 14, scale: reduceMotion ? 1 : 0.99 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: reduceMotion ? 0 : 10 }} transition={{ duration: reduceMotion ? 0 : 0.2 }} className="relative grid max-h-[92vh] w-full max-w-4xl overflow-y-auto bg-[#f8f6f1] md:grid-cols-2">
-            <button ref={closeQuickViewRef} type="button" onClick={() => setQuickView(null)} aria-label="Close quick view" className="absolute right-3 top-3 z-10 bg-[#f8f6f1]/90 p-2 text-[#302923] focus-visible:outline-2 focus-visible:outline-[#a45168]"><X size={20}/></button>
+            <button ref={closeQuickViewRef} type="button" onClick={() => setQuickView(null)} aria-label="Close quick view" className="absolute right-3 top-3 z-10 bg-[#f8f6f1]/90 p-2 text-[#2b1238] focus-visible:outline-2 focus-visible:outline-[#8d287b]"><X size={20}/></button>
             <div className="relative min-h-64 bg-[#eeeae3] sm:min-h-80 md:min-h-[520px]"><Image src={quickView.image} alt={quickView.imageAlt?.trim() || quickView.name} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-contain p-8"/></div>
-            <div className="flex flex-col p-6 sm:p-9 md:justify-center md:p-12"><p className="text-[10px] uppercase tracking-[0.2em] text-[#a45168]">{quickView.category}</p><h2 id="quick-view-title" className="mt-3 font-serif text-3xl leading-tight sm:text-4xl">{quickView.name}</h2><p className="mt-4 text-lg tabular-nums">{formatMoney(quickView.price, currency)}</p><p className="mt-5 line-clamp-5 text-sm leading-7 text-stone-600">{quickView.description}</p>
-              <p className={`mt-4 text-xs uppercase tracking-[0.12em] ${quickView.quantity > 0 ? "text-stone-500" : "text-[#713b4d]"}`}>{quickView.quantity > 0 ? `${quickView.quantity} available` : "Currently unavailable"}</p>
-              {quickView.quantity > 0 && <label className="mt-5 flex items-center gap-4 text-xs uppercase tracking-[0.12em] text-stone-600">Quantity<input type="number" min={1} max={Math.min(99, quickView.quantity)} value={quickQuantity} onChange={(event) => setQuickQuantity(Math.min(Math.min(99, quickView.quantity), Math.max(1, Number(event.target.value) || 1)))} className="h-11 w-20 border border-[#d9d2c8] bg-transparent px-3 text-sm text-[#302923]"/></label>}
-              <button type="button" disabled={quickView.quantity <= 0} onClick={() => addProduct(quickView, quickQuantity)} className="mt-6 min-h-12 w-full bg-[#302923] px-5 text-xs font-semibold uppercase tracking-[0.14em] text-white transition-colors hover:bg-[#713b4d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a45168] disabled:cursor-not-allowed disabled:bg-stone-300">{quickView.quantity > 0 ? "Add to bag" : "Sold out"}</button>
-              <Link href={`/shop/${quickView.id}`} onClick={() => setQuickView(null)} className="mt-4 self-start border-b border-[#a45168] pb-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#713b4d]">View full details</Link>
+            <div className="flex flex-col p-6 sm:p-9 md:justify-center md:p-12"><p className="text-[10px] uppercase tracking-[0.2em] text-[#8d287b]">{quickView.category}</p><h2 id="quick-view-title" className="mt-3 font-serif text-3xl leading-tight sm:text-4xl">{quickView.name}</h2><p className="mt-4 text-lg tabular-nums">{formatMoney(quickView.price, currency)}</p><p className="mt-5 line-clamp-5 text-sm leading-7 text-stone-600">{quickView.description}</p>
+              <p className={`mt-4 text-xs uppercase tracking-[0.12em] ${quickView.quantity > 0 ? "text-stone-500" : "text-[#5b1a68]"}`}>{quickView.quantity > 0 ? `${quickView.quantity} available` : "Currently unavailable"}</p>
+              {quickView.quantity > 0 && <label className="mt-5 flex items-center gap-4 text-xs uppercase tracking-[0.12em] text-stone-600">Quantity<input type="number" min={1} max={Math.min(99, quickView.quantity)} value={quickQuantity} onChange={(event) => setQuickQuantity(Math.min(Math.min(99, quickView.quantity), Math.max(1, Number(event.target.value) || 1)))} className="h-11 w-20 border border-[#d9d2c8] bg-transparent px-3 text-sm text-[#2b1238]"/></label>}
+              <button type="button" disabled={quickView.quantity <= 0} onClick={() => addProduct(quickView, quickQuantity)} className="mt-6 min-h-12 w-full bg-[#2b1238] px-5 text-xs font-semibold uppercase tracking-[0.14em] text-white transition-colors hover:bg-[#5b1a68] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8d287b] disabled:cursor-not-allowed disabled:bg-stone-300">{quickView.quantity > 0 ? "Add to bag" : "Sold out"}</button>
+              <Link href={`/shop/${quickView.id}`} onClick={() => setQuickView(null)} className="mt-4 self-start border-b border-[#8d287b] pb-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#5b1a68]">View full details</Link>
             </div>
           </motion.section>
         </motion.div>}
