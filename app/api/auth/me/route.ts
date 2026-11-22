@@ -1,11 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "@/server/lib/auth";
+import { NextResponse } from "next/server";
+import { getAdminSession } from "@/server/lib/adminSession";
 
-export async function GET(req: NextRequest) {
-  const token = req.cookies.get("admin_token")?.value;
-  if (!token) return NextResponse.json({ authenticated: false }, { status: 401 });
-
-  const session = await verifyToken(token);
+export async function GET() {
+  const session = await getAdminSession();
   if (!session) return NextResponse.json({ authenticated: false }, { status: 401 });
 
   return NextResponse.json({ authenticated: true, role: session.role, username: session.username });

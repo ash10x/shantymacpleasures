@@ -8,6 +8,7 @@ import { ShoppingCart, ChevronDown } from "lucide-react";
 type Order = {
   id: number;
   productId: number;
+  productColor: string;
   quantity: number;
   totalPrice: number;
   customerName: string;
@@ -21,6 +22,13 @@ type Order = {
 };
 
 const STATUSES = ["pending", "processing", "shipped", "delivered", "cancelled"] as const;
+const NEXT_STATUSES: Record<string, readonly string[]> = {
+  pending: ["processing", "cancelled"],
+  processing: ["shipped", "cancelled"],
+  shipped: ["delivered"],
+  delivered: [],
+  cancelled: [],
+};
 
 const STATUS_COLORS: Record<string, string> = {
   pending:    "bg-amber-100 text-amber-700",
@@ -92,6 +100,7 @@ export default function OrdersClient({ orders }: { orders: Order[] }) {
                   <th>Date</th>
                   <th>Customer</th>
                   <th>Product ID</th>
+                  <th>Color</th>
                   <th>Qty</th>
                   <th>Total</th>
                   <th>Coupon</th>
@@ -113,12 +122,13 @@ export default function OrdersClient({ orders }: { orders: Order[] }) {
                       )}
                     </td>
                     <td className="font-mono text-xs">{order.productId}</td>
+                    <td>{order.productColor || <span className="text-slate-400">—</span>}</td>
                     <td>{order.quantity}</td>
                     <td className="font-semibold text-slate-800">
-                      ${(order.totalPrice / 100).toFixed(2)}
+                      USD {order.totalPrice.toFixed(2)}
                       {order.discountAmount > 0 && (
                         <span className="ml-1 text-xs text-green-600">
-                          −${(order.discountAmount / 100).toFixed(2)}
+                          −USD {order.discountAmount.toFixed(2)}
                         </span>
                       )}
                     </td>
@@ -140,7 +150,7 @@ export default function OrdersClient({ orders }: { orders: Order[] }) {
                             className="absolute inset-0 w-full cursor-pointer opacity-0"
                             aria-label="Change status"
                           >
-                            {STATUSES.map((s) => (
+                            {[order.status, ...(NEXT_STATUSES[order.status] ?? [])].map((s) => (
                               <option key={s} value={s}>{s}</option>
                             ))}
                           </select>

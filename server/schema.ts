@@ -6,6 +6,7 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const messages = pgTable("messages", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -31,9 +32,10 @@ export const products = pgTable("products", {
   price: integer().notNull(),
   quantity: integer().notNull(),
   description: varchar({ length: 255 }).notNull(),
-  image: varchar({ length: 255 }).notNull(),
+  image: text().notNull(),
   imageAlt: varchar("image_alt", { length: 255 }),
   category: varchar({ length: 255 }).notNull(),
+  colors: text().array().notNull().default(sql`'{}'::text[]`),
   featured: boolean().notNull().default(false),
   bestseller: boolean().notNull().default(false),
 });
@@ -43,6 +45,7 @@ export const orders = pgTable("orders", {
   productId: integer("product_id").notNull(),
   quantity: integer().notNull(),
   totalPrice: integer("total_price").notNull(),
+  productColor: varchar("product_color", { length: 255 }).notNull().default(""),
   customerName: varchar("customer_name", { length: 255 }).notNull(),
   customerEmail: varchar("customer_email", { length: 255 }).notNull(),
   customerAddress: varchar("customer_address", { length: 500 }),

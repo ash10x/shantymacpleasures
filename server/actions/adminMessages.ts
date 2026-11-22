@@ -3,21 +3,21 @@
 import db from "../index";
 import { messages } from "../schema";
 import { eq, desc } from "drizzle-orm";
-import { getSession } from "../lib/auth";
-import { writeLog } from "./adminLogs";
+import { getAdminSession } from "../lib/adminSession";
+import { writeAuditLog } from "../lib/audit";
 import nodemailer from "nodemailer";
 
 export async function getMessages() {
-  const session = await getSession();
+  const session = await getAdminSession();
   if (!session) throw new Error("Unauthorized");
 
-  await writeLog("VIEW_MESSAGES", "message", undefined, "Viewed messages inbox", session.id);
   return db.select().from(messages).orderBy(desc(messages.createdAt));
 }
 
 export async function markAsRead(id: number) {
-  const session = await getSession();
+  const session = await getAdminSession();
   if (!session) throw new Error("Unauthorized");
+  if (!Number.isSafeInteger(id) || id < 1) throw new Error("Invalid message id");
 
   const [msg] = await db
     .update(messages)
@@ -25,22 +25,28 @@ export async function markAsRead(id: number) {
     .where(eq(messages.id, id))
     .returning();
 
-  await writeLog("READ_MESSAGE", "message", id, `Marked message from "${msg?.name}" as read`, session.id);
+  if (!msg) throw new Error("Message not found");
+  await writeAuditLog("READ_MESSAGE", "message", id, `Marked message from "${msg.name}" as read`, session.id);
   return msg;
 }
 
 export async function deleteMessage(id: number) {
-  const session = await getSession();
+  const session = await getAdminSession();
   if (!session) throw new Error("Unauthorized");
+  if (!Number.isSafeInteger(id) || id < 1) throw new Error("Invalid message id");
 
   const [msg] = await db.delete(messages).where(eq(messages.id, id)).returning();
-  await writeLog("DELETE_MESSAGE", "message", id, `Deleted message from "${msg?.name}"`, session.id);
+  if (!msg) throw new Error("Message not found");
+  await writeAuditLog("DELETE_MESSAGE", "message", id, `Deleted message from "${msg.name}"`, session.id);
   return msg;
 }
 
 export async function replyToMessage(id: number, toEmail: string, toName: string, replyBody: string) {
-  const session = await getSession();
+  const session = await getAdminSession();
   if (!session) throw new Error("Unauthorized");
+  if (!Number.isSafeInteger(id) || id < 1 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(toEmail) || !toName || toName.length > 255 || !replyBody.trim() || replyBody.length > 10000) throw new Error("Invalid reply details");
+  const [message] = await db.select({ email: messages.email, name: messages.name }).from(messages).where(eq(messages.id, id)).limit(1);
+  if (!message?.email || message.email.toLowerCase() !== toEmail.trim().toLowerCase()) throw new Error("Message recipient does not match the stored message");
 
   const adminEmail = process.env.SMTP_USER!;
 
@@ -70,8 +76,8 @@ export async function replyToMessage(id: number, toEmail: string, toName: string
         </tr>
         <tr>
           <td style="padding:32px 40px;">
-            <p style="margin:0 0 20px;font-size:15px;color:#374151;line-height:1.6;">Hi <strong>${toName}</strong>,</p>
-            <div style="font-size:15px;color:#374151;line-height:1.6;white-space:pre-wrap;">${replyBody}</div>
+            <p style="margin:0 0 20px;font-size:15px;color:#374151;line-height:1.6;">Hi <strong>${escapeHtml(toName)}</strong>,</p>
+            <div style="font-size:15px;color:#374151;line-height:1.6;white-space:pre-wrap;">${escapeHtml(replyBody)}</div>
             <p style="margin:24px 0 0;font-size:15px;color:#374151;">— The Shanty Mac Pleasures Team</p>
           </td>
         </tr>
@@ -88,5 +94,9 @@ export async function replyToMessage(id: number, toEmail: string, toName: string
   });
 
   await db.update(messages).set({ read: true, replied: true }).where(eq(messages.id, id));
-  await writeLog("REPLY_MESSAGE", "message", id, `Replied to "${toName}": ${replyBody}`, session.id);
+  await writeAuditLog("REPLY_MESSAGE", "message", id, `Sent reply to message from "${toName}"`, session.id);
+}
+
+function escapeHtml(value: string) {
+  return value.replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]!);
 }

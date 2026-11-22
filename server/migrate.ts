@@ -3,7 +3,7 @@
  * Run with: npx tsx server/migrate.ts
  */
 import { config } from "dotenv";
-config({ path: ".env.local" });
+config({ path: [".env.local", ".env"] });
 import { neon } from "@neondatabase/serverless";
 
 const sql = neon(process.env.DATABASE_URL!);
@@ -88,6 +88,17 @@ async function main() {
       "active" boolean NOT NULL DEFAULT true
     )
   `;
+
+  // 0008 – support selectable product color variants and keep order selections.
+  await sql`ALTER TABLE products ADD COLUMN IF NOT EXISTS colors text[] NOT NULL DEFAULT '{}'::text[]`;
+  await sql`DO $$ BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='products' AND column_name='color') THEN
+      UPDATE products SET colors = CASE WHEN btrim(color) = '' THEN '{}'::text[] ELSE ARRAY(SELECT btrim(value) FROM unnest(string_to_array(color, ',')) AS color_values(value) WHERE btrim(value) <> '') END WHERE cardinality(colors) = 0;
+      ALTER TABLE products DROP COLUMN color;
+    END IF;
+  END $$`;
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS product_color varchar(255) NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE products ALTER COLUMN image TYPE text`;
 
   console.log("All migrations applied.");
 }

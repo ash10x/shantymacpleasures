@@ -1,7 +1,7 @@
-import { getSession } from "@/server/lib/auth";
+import { getAdminSession } from "@/server/lib/adminSession";
 import db from "@/server/index";
 import { products, messages, users, logs, orders } from "@/server/schema";
-import { desc, lte } from "drizzle-orm";
+import { count, desc, eq, lte } from "drizzle-orm";
 import { Package, Mail, ShoppingCart, Users, Activity, AlertTriangle } from "lucide-react";
 import RecentActivityList from "./RecentActivityList";
 import Link from "next/link";
@@ -9,26 +9,31 @@ import Link from "next/link";
 const LOW_STOCK_THRESHOLD = 5;
 
 export default async function DashboardPage() {
-  const session = await getSession();
+  const session = await getAdminSession();
 
-  const [productRows, messageRows, userRows, orderRows, recentLogs, lowStockRows] = await Promise.all([
-    db.select().from(products),
-    db.select().from(messages),
-    db.select().from(users),
-    db.select().from(orders),
+  const [productCountRows, messageCountRows, userCountRows, orderCountRows, pendingCountRows, recentLogs, lowStockRows] = await Promise.all([
+    db.select({ value: count() }).from(products),
+    db.select({ value: count() }).from(messages),
+    db.select({ value: count() }).from(users),
+    db.select({ value: count() }).from(orders),
+    db.select({ value: count() }).from(orders).where(eq(orders.status, "pending")),
     db.select().from(logs).orderBy(desc(logs.createdAt)).limit(10),
-    db.select().from(products).where(lte(products.quantity, LOW_STOCK_THRESHOLD)),
+    db.select({ id: products.id, name: products.name, quantity: products.quantity }).from(products).where(lte(products.quantity, LOW_STOCK_THRESHOLD)),
   ]);
 
-  const pendingOrders = orderRows.filter((o) => o.status === "pending").length;
+  const pendingOrders = pendingCountRows[0]?.value ?? 0;
+  const productCount = productCountRows[0]?.value ?? 0;
+  const messageCount = messageCountRows[0]?.value ?? 0;
+  const userCount = userCountRows[0]?.value ?? 0;
+  const orderCount = orderCountRows[0]?.value ?? 0;
   const outOfStock = lowStockRows.filter((p) => p.quantity === 0);
   const lowStock = lowStockRows.filter((p) => p.quantity > 0);
 
   const stats = [
-    { label: "Products", value: productRows.length, icon: Package, color: "from-pink-500 to-rose-500", href: "/admin/dashboard/products" },
-    { label: "Messages", value: messageRows.length, icon: Mail, color: "from-purple-500 to-indigo-500", href: "/admin/dashboard/messages" },
-    { label: "Orders", value: orderRows.length, badge: pendingOrders > 0 ? `${pendingOrders} pending` : null, icon: ShoppingCart, color: "from-orange-400 to-amber-500", href: "/admin/dashboard/orders" },
-    { label: "Admin Users", value: userRows.length, icon: Users, color: "from-teal-400 to-cyan-500", href: "/admin/dashboard/users" },
+    { label: "Products", value: productCount, icon: Package, color: "from-pink-500 to-rose-500", href: "/admin/dashboard/products" },
+    { label: "Messages", value: messageCount, icon: Mail, color: "from-purple-500 to-indigo-500", href: "/admin/dashboard/messages" },
+    { label: "Order records", value: orderCount, badge: pendingOrders > 0 ? `${pendingOrders} pending` : null, icon: ShoppingCart, color: "from-orange-400 to-amber-500", href: "/admin/dashboard/orders" },
+    { label: "Admin Users", value: userCount, icon: Users, color: "from-teal-400 to-cyan-500", href: "/admin/dashboard/users" },
   ];
 
   return (

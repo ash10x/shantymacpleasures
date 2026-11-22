@@ -46,6 +46,7 @@ export default async function ProductPage({
             alt={product.name}
             width={400}
             height={400}
+            unoptimized
             className="object-contain max-h-80 w-auto"
           />
         </div>
@@ -59,11 +60,12 @@ export default async function ProductPage({
             <h1 className="mt-2 text-3xl font-semibold text-gray-800">
               {product.name}
             </h1>
+            {product.colors.length > 0 && <p className="mt-3 text-sm text-gray-600">Available colors: {product.colors.join(", ")}</p>}
             <p className="mt-4 text-gray-500 text-sm leading-relaxed">
               {product.description}
             </p>
             <p className="mt-6 text-2xl font-bold bg-linear-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-              <ProductPrice minorUnits={product.price} />
+              <ProductPrice usdDollars={product.price} />
             </p>
             <p className="mt-1 text-xs text-gray-400">
               {product.quantity > 0 ? `${product.quantity} in stock` : "Out of stock"}
@@ -77,6 +79,7 @@ export default async function ProductPage({
               price={product.price}
               image={product.image}
               quantity={product.quantity}
+              colors={product.colors}
             />
           </div>
         </div>

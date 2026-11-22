@@ -5,7 +5,6 @@ import { useCart } from "@/app/context/cartContext";
 import Link from "next/link";
 import Image from "next/image";
 import { formatMoney } from "@/server/lib/money";
-import { useCurrency } from "@/app/context/currencyContext";
 
 export default function MiniCart({
   isOpen,
@@ -15,7 +14,6 @@ export default function MiniCart({
   onClose: () => void;
 }) {
   const { cart, total, increaseQty, decreaseQty, removeFromCart } = useCart();
-  const { currency } = useCurrency();
 
   return (
     <AnimatePresence>
@@ -58,23 +56,25 @@ export default function MiniCart({
                 </p>
               ) : (
                 cart.map((item) => (
-                  <div key={item.id} className="flex gap-3 border-b pb-4">
+                  <div key={item.key} className="flex gap-3 border-b pb-4">
                     <Image
                       src={item.image}
                       alt={item.name}
                       width={64}
                       height={64}
+                      unoptimized
                       className="w-16 h-16 rounded-lg object-cover"
                     />
 
                     <div className="flex-1">
                       <p className="text-sm font-medium">{item.name}</p>
-                      <p className="text-xs text-black/60">{formatMoney(item.price, currency)}</p>
+                      {item.color && <p className="text-xs text-black/60">Color: {item.color}</p>}
+                      <p className="text-xs text-black/60">{formatMoney(item.price)}</p>
 
                       {/* QUANTITY */}
                       <div className="flex items-center gap-2 mt-2">
                         <button
-                          onClick={() => decreaseQty(item.id)}
+                          onClick={() => decreaseQty(item.key)}
                           aria-label={`Decrease ${item.name} quantity`}
                           className="w-6 h-6 rounded bg-gray-100 hover:bg-pink-100"
                         >
@@ -84,7 +84,7 @@ export default function MiniCart({
                         <span className="text-sm">{item.quantity}</span>
 
                         <button
-                          onClick={() => increaseQty(item.id)}
+                          onClick={() => increaseQty(item.key)}
                           aria-label={`Increase ${item.name} quantity`}
                           className="w-6 h-6 rounded bg-gray-100 hover:bg-pink-100"
                         >
@@ -95,7 +95,7 @@ export default function MiniCart({
 
                     {/* REMOVE */}
                     <button
-                      onClick={() => removeFromCart(item.id)}
+                      onClick={() => removeFromCart(item.key)}
                       aria-label={`Remove ${item.name} from cart`}
                       className="text-sm hover:text-red-500"
                     >
@@ -110,9 +110,8 @@ export default function MiniCart({
             <div className="mt-6">
               <div className="flex justify-between font-semibold mb-4">
                 <span>Total</span>
-                <span>{formatMoney(total, currency)}</span>
+                <span>{formatMoney(total)}</span>
               </div>
-              {currency === "JMD" && <p className="-mt-2 mb-3 text-xs text-slate-500">Approximate JMD display. Order prices are recorded in USD.</p>}
 
               {/* CHECKOUT */}
               <Link href="/checkout">

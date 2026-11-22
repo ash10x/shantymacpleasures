@@ -6,8 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowDownWideNarrow, ArrowRight, Check, Filter, Search, X } from "lucide-react";
 import { useCart } from "../context/cartContext";
-import { useCurrency } from "@/app/context/currencyContext";
-import { formatMoney } from "@/server/lib/money";
+import { convertUsdToJmd, formatMoney } from "@/server/lib/money";
 import type { products } from "@/server/schema";
 
 type Product = typeof products.$inferSelect;
@@ -23,7 +22,6 @@ interface Props {
 
 export default function ShopClient({ products, categories, initialCategory = "All" }: Props) {
   const { addToCart } = useCart();
-  const { currency } = useCurrency();
   const reduceMotion = useReducedMotion();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState(initialCategory);
@@ -35,6 +33,7 @@ export default function ShopClient({ products, categories, initialCategory = "Al
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [quickView, setQuickView] = useState<Product | null>(null);
   const [quickQuantity, setQuickQuantity] = useState(1);
+  const [selectedColor, setSelectedColor] = useState("");
   const [addedProductId, setAddedProductId] = useState<number | null>(null);
   const closeQuickViewRef = useRef<HTMLButtonElement>(null);
   const closeFiltersRef = useRef<HTMLButtonElement>(null);
@@ -42,14 +41,15 @@ export default function ShopClient({ products, categories, initialCategory = "Al
 
   const filteredProducts = useMemo(() => {
     const query = search.trim().toLocaleLowerCase();
-    const min = minPrice.trim() ? Math.max(0, Number(minPrice) * 100) : null;
-    const max = maxPrice.trim() ? Math.max(0, Number(maxPrice) * 100) : null;
+    const min = minPrice.trim() ? Math.max(0, Number(minPrice)) : null;
+    const max = maxPrice.trim() ? Math.max(0, Number(maxPrice)) : null;
     const filtered = products.filter((product) => {
-      const matchesQuery = !query || `${product.name} ${product.category} ${product.description}`.toLocaleLowerCase().includes(query);
+      const matchesQuery = !query || `${product.name} ${product.category} ${product.colors.join(" ")} ${product.description}`.toLocaleLowerCase().includes(query);
       const matchesCategory = category === "All" || product.category === category;
       const matchesStock = availability === "all" || product.quantity > 0;
-      const matchesMin = min === null || !Number.isFinite(min) || product.price >= min;
-      const matchesMax = max === null || !Number.isFinite(max) || product.price <= max;
+      const displayPrice = convertUsdToJmd(product.price);
+      const matchesMin = min === null || !Number.isFinite(min) || displayPrice >= min;
+      const matchesMax = max === null || !Number.isFinite(max) || displayPrice <= max;
       return matchesQuery && matchesCategory && matchesStock && matchesMin && matchesMax;
     });
 
@@ -81,6 +81,7 @@ export default function ShopClient({ products, categories, initialCategory = "Al
   const openQuickView = (product: Product) => {
     returnFocusRef.current = document.activeElement as HTMLElement;
     setQuickQuantity(1);
+    setSelectedColor("");
     setQuickView(product);
   };
 
@@ -125,9 +126,13 @@ export default function ShopClient({ products, categories, initialCategory = "Al
     else if (!quickView) requestAnimationFrame(() => returnFocusRef.current?.focus());
   }, [filtersOpen, quickView]);
 
-  const addProduct = (product: Product, quantity = 1) => {
+  const addProduct = (product: Product, quantity = 1, color = "") => {
     if (product.quantity <= 0 || quantity < 1 || quantity > product.quantity) return;
-    addToCart({ id: product.id, name: product.name, price: product.price, image: product.image }, quantity);
+    if (product.colors.length > 0 && !color) {
+      openQuickView(product);
+      return;
+    }
+    addToCart({ id: product.id, name: product.name, price: product.price, image: product.image, color }, quantity);
     setAddedProductId(product.id);
     window.dispatchEvent(new Event("open-cart"));
     setTimeout(() => setAddedProductId((current) => current === product.id ? null : current), 1600);
@@ -155,14 +160,14 @@ export default function ShopClient({ products, categories, initialCategory = "Al
         </select>
       </label>
       <div className="flex items-center gap-2">
-        <span className="whitespace-nowrap text-xs uppercase tracking-[0.12em] text-stone-500">USD price</span>
+        <span className="whitespace-nowrap text-xs uppercase tracking-[0.12em] text-stone-500">JMD price</span>
         <label className="flex items-center gap-1 border-b border-stone-300 px-1 text-sm focus-within:border-stone-900">
-          <span className="sr-only">Minimum price in USD</span><span className="text-[10px] font-medium text-stone-400">USD</span>
+          <span className="sr-only">Minimum price in JMD</span><span className="text-[10px] font-medium text-stone-400">JMD</span>
           <input inputMode="decimal" type="number" min="0" step="1" value={minPrice} onChange={(event) => { setMinPrice(event.target.value); setPage(1); }} placeholder="Min" className="w-14 bg-transparent py-3 outline-none placeholder:text-stone-400" />
         </label>
         <span className="text-stone-400">–</span>
         <label className="flex items-center gap-1 border-b border-stone-300 px-1 text-sm focus-within:border-stone-900">
-          <span className="sr-only">Maximum price in USD</span><span className="text-[10px] font-medium text-stone-400">USD</span>
+          <span className="sr-only">Maximum price in JMD</span><span className="text-[10px] font-medium text-stone-400">JMD</span>
           <input inputMode="decimal" type="number" min="0" step="1" value={maxPrice} onChange={(event) => { setMaxPrice(event.target.value); setPage(1); }} placeholder="Max" className="w-14 bg-transparent py-3 outline-none placeholder:text-stone-400" />
         </label>
       </div>
@@ -223,7 +228,7 @@ export default function ShopClient({ products, categories, initialCategory = "Al
               <article key={product.id} className="group min-w-0">
                 <div className="relative aspect-[4/5] overflow-hidden bg-[#eeeae3]">
                   <Link href={`/shop/${product.id}`} aria-label={`View ${product.name}`} className="absolute inset-0 z-[1] focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#8d287b]">
-                    <Image src={product.image} alt={product.imageAlt?.trim() || product.name} fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" loading="lazy" className="object-contain p-4 transition-transform duration-500 ease-out group-hover:scale-[1.035] motion-reduce:transition-none" />
+                    <Image src={product.image} alt={product.imageAlt?.trim() || product.name} fill unoptimized sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" loading="lazy" className="object-contain p-4 transition-transform duration-500 ease-out group-hover:scale-[1.035] motion-reduce:transition-none" />
                   </Link>
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 motion-reduce:transition-none" />
                   {product.featured && <span className="absolute left-2 top-2 z-[2] bg-[#f8f6f1]/95 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#5b1a68] sm:left-3 sm:top-3 sm:px-2.5">Featured</span>}
@@ -234,7 +239,8 @@ export default function ShopClient({ products, categories, initialCategory = "Al
                 <div className="pt-3 sm:pt-4">
                   <p className="truncate text-[9px] uppercase tracking-[0.16em] text-stone-500 sm:text-[10px]">{product.category}</p>
                   <Link href={`/shop/${product.id}`} className="mt-1 block"><h3 className="line-clamp-2 min-h-10 font-serif text-base leading-snug text-[#2e2824] transition-colors group-hover:text-[#5b1a68] sm:text-lg">{product.name}</h3></Link>
-                  <div className="mt-1 flex flex-wrap items-center justify-between gap-x-2 gap-y-1"><p className="text-sm font-medium tabular-nums text-[#2b1238] sm:text-base">{formatMoney(product.price, currency)}</p><span className={`text-[9px] uppercase tracking-[0.1em] ${product.quantity > 0 ? "text-stone-500" : "text-stone-400"}`}>{product.quantity > 0 ? "In stock" : "Unavailable"}</span></div>
+                  {product.colors.length > 0 && <p className="mt-1 text-xs text-stone-500">{product.colors.length} colors available</p>}
+                  <div className="mt-1 flex flex-wrap items-center justify-between gap-x-2 gap-y-1"><p className="text-sm font-medium tabular-nums text-[#2b1238] sm:text-base">{formatMoney(product.price)}</p><span className={`text-[9px] uppercase tracking-[0.1em] ${product.quantity > 0 ? "text-stone-500" : "text-stone-400"}`}>{product.quantity > 0 ? "In stock" : "Unavailable"}</span></div>
                   <div className="mt-3 flex items-center gap-3">
                     <button type="button" disabled={product.quantity <= 0} onClick={() => addProduct(product)} className="min-h-10 flex-1 border border-[#662071] px-2 text-[9px] font-semibold uppercase tracking-[0.12em] text-[#2b1238] transition-colors hover:bg-[#2b1238] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8d287b] disabled:cursor-not-allowed disabled:border-stone-300 disabled:text-stone-400 disabled:hover:bg-transparent disabled:hover:text-stone-400 sm:text-[10px]">{addedProductId === product.id ? <span className="inline-flex items-center gap-1"><Check size={13}/> Added</span> : product.quantity > 0 ? "Add to bag" : "Sold out"}</button>
                     <Link href={`/shop/${product.id}`} className="hidden text-[10px] uppercase tracking-[0.12em] text-stone-500 underline-offset-4 hover:text-stone-900 hover:underline focus-visible:outline-2 focus-visible:outline-[#8d287b] sm:inline">Details</Link>
@@ -273,11 +279,12 @@ export default function ShopClient({ products, categories, initialCategory = "Al
         {quickView && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduceMotion ? 0 : 0.18 }} className="fixed inset-0 z-[80] flex items-center justify-center bg-black/45 p-3 sm:p-6" onMouseDown={(event) => { if (event.target === event.currentTarget) setQuickView(null); }}>
           <motion.section data-shop-dialog role="dialog" aria-modal="true" aria-labelledby="quick-view-title" initial={{ opacity: 0, y: reduceMotion ? 0 : 14, scale: reduceMotion ? 1 : 0.99 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: reduceMotion ? 0 : 10 }} transition={{ duration: reduceMotion ? 0 : 0.2 }} className="relative grid max-h-[92vh] w-full max-w-4xl overflow-y-auto bg-[#f8f6f1] md:grid-cols-2">
             <button ref={closeQuickViewRef} type="button" onClick={() => setQuickView(null)} aria-label="Close quick view" className="absolute right-3 top-3 z-10 bg-[#f8f6f1]/90 p-2 text-[#2b1238] focus-visible:outline-2 focus-visible:outline-[#8d287b]"><X size={20}/></button>
-            <div className="relative min-h-64 bg-[#eeeae3] sm:min-h-80 md:min-h-[520px]"><Image src={quickView.image} alt={quickView.imageAlt?.trim() || quickView.name} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-contain p-8"/></div>
-            <div className="flex flex-col p-6 sm:p-9 md:justify-center md:p-12"><p className="text-[10px] uppercase tracking-[0.2em] text-[#8d287b]">{quickView.category}</p><h2 id="quick-view-title" className="mt-3 font-serif text-3xl leading-tight sm:text-4xl">{quickView.name}</h2><p className="mt-4 text-lg tabular-nums">{formatMoney(quickView.price, currency)}</p><p className="mt-5 line-clamp-5 text-sm leading-7 text-stone-600">{quickView.description}</p>
+            <div className="relative min-h-64 bg-[#eeeae3] sm:min-h-80 md:min-h-[520px]"><Image src={quickView.image} alt={quickView.imageAlt?.trim() || quickView.name} fill unoptimized sizes="(max-width: 768px) 100vw, 50vw" className="object-contain p-8"/></div>
+            <div className="flex flex-col p-6 sm:p-9 md:justify-center md:p-12"><p className="text-[10px] uppercase tracking-[0.2em] text-[#8d287b]">{quickView.category}</p><h2 id="quick-view-title" className="mt-3 font-serif text-3xl leading-tight sm:text-4xl">{quickView.name}</h2><p className="mt-4 text-lg tabular-nums">{formatMoney(quickView.price)}</p><p className="mt-5 line-clamp-5 text-sm leading-7 text-stone-600">{quickView.description}</p>
+              {quickView.colors.length > 0 && <label className="mt-5 block text-xs uppercase tracking-[0.12em] text-stone-600">Choose a color<select value={selectedColor} onChange={(event) => setSelectedColor(event.target.value)} className="mt-2 h-11 w-full border border-[#d9d2c8] bg-transparent px-3 text-sm normal-case tracking-normal text-[#2b1238]"><option value="">Select a color</option>{quickView.colors.map((color) => <option key={color} value={color}>{color}</option>)}</select></label>}
               <p className={`mt-4 text-xs uppercase tracking-[0.12em] ${quickView.quantity > 0 ? "text-stone-500" : "text-[#5b1a68]"}`}>{quickView.quantity > 0 ? `${quickView.quantity} available` : "Currently unavailable"}</p>
               {quickView.quantity > 0 && <label className="mt-5 flex items-center gap-4 text-xs uppercase tracking-[0.12em] text-stone-600">Quantity<input type="number" min={1} max={Math.min(99, quickView.quantity)} value={quickQuantity} onChange={(event) => setQuickQuantity(Math.min(Math.min(99, quickView.quantity), Math.max(1, Number(event.target.value) || 1)))} className="h-11 w-20 border border-[#d9d2c8] bg-transparent px-3 text-sm text-[#2b1238]"/></label>}
-              <button type="button" disabled={quickView.quantity <= 0} onClick={() => addProduct(quickView, quickQuantity)} className="mt-6 min-h-12 w-full bg-[#2b1238] px-5 text-xs font-semibold uppercase tracking-[0.14em] text-white transition-colors hover:bg-[#5b1a68] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8d287b] disabled:cursor-not-allowed disabled:bg-stone-300">{quickView.quantity > 0 ? "Add to bag" : "Sold out"}</button>
+              <button type="button" disabled={quickView.quantity <= 0 || (quickView.colors.length > 0 && !selectedColor)} onClick={() => addProduct(quickView, quickQuantity, selectedColor)} className="mt-6 min-h-12 w-full bg-[#2b1238] px-5 text-xs font-semibold uppercase tracking-[0.14em] text-white transition-colors hover:bg-[#5b1a68] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8d287b] disabled:cursor-not-allowed disabled:bg-stone-300">{quickView.quantity <= 0 ? "Sold out" : quickView.colors.length > 0 && !selectedColor ? "Choose a color" : "Add to bag"}</button>
               <Link href={`/shop/${quickView.id}`} onClick={() => setQuickView(null)} className="mt-4 self-start border-b border-[#8d287b] pb-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#5b1a68]">View full details</Link>
             </div>
           </motion.section>

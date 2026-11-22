@@ -17,8 +17,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Invalid reset token" }, { status: 400 });
     }
 
-    if (!password || typeof password !== "string" || password.length < 8) {
-      return NextResponse.json({ message: "Password must be at least 8 characters." }, { status: 400 });
+    if (!password || typeof password !== "string" || password.length < 12 || password.length > 1024) {
+      return NextResponse.json({ message: "Password must be between 12 and 1024 characters." }, { status: 400 });
     }
 
     const tokenHash = hashToken(token);
@@ -38,13 +38,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Reset link is invalid or expired." }, { status: 400 });
     }
 
-    const passwordHash = await bcrypt.hash(password, 12);
-
-    await db.update(users).set({ passwordHash }).where(eq(users.id, resetRecord.userId));
-    await db
+    const [claimedToken] = await db
       .update(passwordResetTokens)
       .set({ usedAt: new Date() })
-      .where(eq(passwordResetTokens.id, resetRecord.id));
+      .where(and(
+        eq(passwordResetTokens.id, resetRecord.id),
+        isNull(passwordResetTokens.usedAt),
+        gt(passwordResetTokens.expiresAt, new Date()),
+      ))
+      .returning({ id: passwordResetTokens.id });
+    if (!claimedToken) return NextResponse.json({ message: "Reset link is invalid or expired." }, { status: 400 });
+
+    const passwordHash = await bcrypt.hash(password, 12);
+    await db.update(users).set({ passwordHash }).where(eq(users.id, resetRecord.userId));
 
     return NextResponse.json({ ok: true });
   } catch {

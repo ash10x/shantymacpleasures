@@ -24,6 +24,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, message: "If that account exists, a reset link has been sent." });
     }
 
+    if (!process.env.SMTP_HOST || !process.env.SMTP_PORT || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      console.error("[auth/reset] Password reset email is unavailable because SMTP is not configured");
+      return NextResponse.json({ ok: true, message: "If that account exists, a reset link has been sent." });
+    }
+
     await db.delete(passwordResetTokens).where(eq(passwordResetTokens.userId, user.id));
 
     const rawToken = randomBytes(32).toString("hex");
@@ -36,10 +41,10 @@ export async function POST(req: NextRequest) {
       expiresAt,
     });
 
-    const origin = req.nextUrl.origin;
-    const resetUrl = `${origin}/admin/reset-password?token=${rawToken}`;
+    const trustedOrigin = process.env.NEXT_PUBLIC_SITE_URL || (process.env.NODE_ENV === "production" ? "https://www.shantymacpleasures.com" : req.nextUrl.origin);
+    const resetUrl = new URL(`/admin/reset-password?token=${rawToken}`, trustedOrigin).toString();
 
-    if (process.env.SMTP_HOST && process.env.SMTP_PORT && process.env.SMTP_USER && process.env.SMTP_PASS) {
+    {
       const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: Number(process.env.SMTP_PORT),
@@ -57,8 +62,6 @@ export async function POST(req: NextRequest) {
         subject: "Reset your admin password",
         html: `<p>You requested a password reset.</p><p><a href=\"${resetUrl}\">Click here to reset your password</a></p><p>This link expires in 30 minutes.</p>`,
       });
-    } else {
-      console.warn("SMTP is not configured. Password reset link:", resetUrl);
     }
 
     return NextResponse.json({ ok: true, message: "If that account exists, a reset link has been sent." });

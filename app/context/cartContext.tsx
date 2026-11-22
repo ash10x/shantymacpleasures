@@ -3,19 +3,21 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
 export type CartItem = {
+  key: string;
   id: number;
   name: string;
   price: number;
   image: string;
+  color: string;
   quantity: number;
 };
 
 type CartContextType = {
   cart: CartItem[];
-  addToCart: (product: Omit<CartItem, "quantity">, quantity?: number) => void;
-  removeFromCart: (id: number) => void;
-  increaseQty: (id: number) => void;
-  decreaseQty: (id: number) => void;
+  addToCart: (product: Omit<CartItem, "quantity" | "key">, quantity?: number) => void;
+  removeFromCart: (key: string) => void;
+  increaseQty: (key: string) => void;
+  decreaseQty: (key: string) => void;
   total: number;
   clearCart: () => void;
 };
@@ -31,7 +33,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     try {
       const storedCart = localStorage.getItem("cart");
       if (storedCart) {
-        setCart(JSON.parse(storedCart));
+        const saved = JSON.parse(storedCart) as Array<Partial<CartItem> & Pick<CartItem, "id" | "name" | "price" | "image" | "quantity">>;
+        setCart(saved.map((item) => {
+          const color = item.color ?? "";
+          return { ...item, color, key: `${item.id}:${color}` } as CartItem;
+        }));
       }
     } catch (err) {
       console.error("Failed to load cart:", err);
@@ -52,40 +58,42 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [cart, isLoaded]);
 
   /* ================= CART FUNCTIONS ================= */
-  const addToCart = (product: Omit<CartItem, "quantity">, quantity = 1) => {
+  const addToCart = (product: Omit<CartItem, "quantity" | "key">, quantity = 1) => {
     if (!Number.isSafeInteger(quantity) || quantity < 1 || quantity > 99) return;
+    const color = product.color ?? "";
+    const key = `${product.id}:${color}`;
     setCart((prev) => {
-      const existing = prev.find((item) => item.id === product.id);
+      const existing = prev.find((item) => item.key === key);
 
       if (existing) {
         return prev.map((item) =>
-          item.id === product.id
+          item.key === key
             ? { ...item, quantity: Math.min(99, item.quantity + quantity) }
             : item,
         );
       }
 
-      return [...prev, { ...product, quantity }];
+      return [...prev, { ...product, color, key, quantity }];
     });
   };
 
-  const removeFromCart = (id: number) => {
-    setCart((prev) => prev.filter((item) => item.id !== id));
+  const removeFromCart = (key: string) => {
+    setCart((prev) => prev.filter((item) => item.key !== key));
   };
 
-  const increaseQty = (id: number) => {
+  const increaseQty = (key: string) => {
     setCart((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item,
+        item.key === key ? { ...item, quantity: item.quantity + 1 } : item,
       ),
     );
   };
 
-  const decreaseQty = (id: number) => {
+  const decreaseQty = (key: string) => {
     setCart((prev) =>
       prev
         .map((item) =>
-          item.id === id ? { ...item, quantity: item.quantity - 1 } : item,
+          item.key === key ? { ...item, quantity: item.quantity - 1 } : item,
         )
         .filter((item) => item.quantity > 0),
     );
