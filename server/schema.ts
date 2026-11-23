@@ -60,8 +60,8 @@ export const coupons = pgTable("coupons", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   code: varchar({ length: 50 }).notNull().unique(),
   type: varchar({ length: 20 }).notNull().default("percent"), // "percent" | "flat"
-  amount: integer().notNull(), // percent 1-100 or cents
-  minOrder: integer("min_order").notNull().default(0),
+  amount: integer().notNull(), // percent 1-100 or JMD cents for flat coupons
+  minOrder: integer("min_order").notNull().default(0), // JMD cents
   maxUses: integer("max_uses"),
   uses: integer().notNull().default(0),
   active: boolean().notNull().default(true),

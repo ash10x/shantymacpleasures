@@ -67,10 +67,10 @@ export async function placeOrder(input: OrderInput) {
     if (coupon.expiresAt && new Date(coupon.expiresAt) < new Date()) throw new Error("Coupon has expired");
     if (coupon.maxUses !== null && coupon.uses >= coupon.maxUses) throw new Error("Coupon usage limit reached");
 
-    if (subtotal * 100 < coupon.minOrder) throw new Error(`Minimum order for this coupon is $${(coupon.minOrder / 100).toFixed(2)}`);
+    if (subtotal * 100 < coupon.minOrder) throw new Error(`Minimum order for this coupon is JMD ${(coupon.minOrder / 100).toFixed(2)}`);
 
-    // Product prices and order totals are stored as whole USD dollars; coupon
-    // fixed amounts and minimums are stored in cents. Keep the conversion here.
+    // Product prices and order totals are whole JMD; coupon fixed amounts and
+    // minimums are stored as JMD cents.
     discountAmount = coupon.type === "percent"
       ? Math.round((subtotal * coupon.amount) / 100)
       : Math.min(Math.round(coupon.amount / 100), subtotal);
@@ -122,7 +122,7 @@ export async function validateCoupon(code: string, subtotal: number) {
   if (!coupon || !coupon.active) throw new Error("Invalid or inactive coupon");
   if (coupon.expiresAt && new Date(coupon.expiresAt) < new Date()) throw new Error("Coupon has expired");
   if (coupon.maxUses !== null && coupon.uses >= coupon.maxUses) throw new Error("Usage limit reached");
-  if (subtotal * 100 < coupon.minOrder) throw new Error(`Minimum order $${(coupon.minOrder / 100).toFixed(2)} required`);
+  if (subtotal * 100 < coupon.minOrder) throw new Error(`Minimum order JMD ${(coupon.minOrder / 100).toFixed(2)} required`);
 
   const discount = coupon.type === "percent"
     ? Math.round((subtotal * coupon.amount) / 100)

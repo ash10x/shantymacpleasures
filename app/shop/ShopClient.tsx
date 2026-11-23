@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowDownWideNarrow, ArrowRight, Check, Filter, Search, X } from "lucide-react";
 import { useCart } from "../context/cartContext";
-import { convertUsdToJmd, formatMoney } from "@/server/lib/money";
+import { formatMoney } from "@/server/lib/money";
 import type { products } from "@/server/schema";
 
 type Product = typeof products.$inferSelect;
@@ -47,7 +47,7 @@ export default function ShopClient({ products, categories, initialCategory = "Al
       const matchesQuery = !query || `${product.name} ${product.category} ${product.colors.join(" ")} ${product.description}`.toLocaleLowerCase().includes(query);
       const matchesCategory = category === "All" || product.category === category;
       const matchesStock = availability === "all" || product.quantity > 0;
-      const displayPrice = convertUsdToJmd(product.price);
+      const displayPrice = product.price;
       const matchesMin = min === null || !Number.isFinite(min) || displayPrice >= min;
       const matchesMax = max === null || !Number.isFinite(max) || displayPrice <= max;
       return matchesQuery && matchesCategory && matchesStock && matchesMin && matchesMax;
@@ -238,7 +238,7 @@ export default function ShopClient({ products, categories, initialCategory = "Al
                 </div>
                 <div className="pt-3 sm:pt-4">
                   <p className="truncate text-[9px] uppercase tracking-[0.16em] text-stone-500 sm:text-[10px]">{product.category}</p>
-                  <Link href={`/shop/${product.id}`} className="mt-1 block"><h3 className="line-clamp-2 min-h-10 font-serif text-base leading-snug text-[#2e2824] transition-colors group-hover:text-[#5b1a68] sm:text-lg">{product.name}</h3></Link>
+                  <Link href={`/shop/${product.id}`} className="mt-1 block"><h3 className="product-card-title font-serif text-base leading-snug text-[#2e2824] transition-colors group-hover:text-[#5b1a68] sm:text-lg">{product.name}</h3></Link>
                   {product.colors.length > 0 && <p className="mt-1 text-xs text-stone-500">{product.colors.length} colors available</p>}
                   <div className="mt-1 flex flex-wrap items-center justify-between gap-x-2 gap-y-1"><p className="text-sm font-medium tabular-nums text-[#2b1238] sm:text-base">{formatMoney(product.price)}</p><span className={`text-[9px] uppercase tracking-[0.1em] ${product.quantity > 0 ? "text-stone-500" : "text-stone-400"}`}>{product.quantity > 0 ? "In stock" : "Unavailable"}</span></div>
                   <div className="mt-3 flex items-center gap-3">

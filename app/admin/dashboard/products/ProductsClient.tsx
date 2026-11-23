@@ -299,7 +299,7 @@ export default function ProductsClient({ products }: { products: Product[] }) {
                 {categoryOptions.map((c) => <option key={c} value={c} />)}
               </datalist>
             </div>
-            {field("price", "Price ($)", "number")}
+            {field("price", "Price (JMD)", "number")}
             {field("quantity", "Quantity", "number")}
             <div>
               <label className="admin-kicker mb-1 block" htmlFor="product-colors">Available Colors</label>
@@ -408,7 +408,7 @@ export default function ProductsClient({ products }: { products: Product[] }) {
                   <span className="admin-badge admin-badge-purple">{p.category}</span>
                 </td>
                 <td>{p.colors.length ? p.colors.join(", ") : <span className="text-slate-400">—</span>}</td>
-                <td className="font-semibold text-slate-800">${p.price}</td>
+                <td className="font-semibold text-slate-800">JMD {p.price}</td>
                 <td>{p.quantity}</td>
                 <td>
                   <div className="flex gap-1 flex-wrap">

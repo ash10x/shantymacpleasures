@@ -65,7 +65,7 @@ export default async function ProductPage({
               {product.description}
             </p>
             <p className="mt-6 text-2xl font-bold bg-linear-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-              <ProductPrice usdDollars={product.price} />
+              <ProductPrice amountJmd={product.price} />
             </p>
             <p className="mt-1 text-xs text-gray-400">
               {product.quantity > 0 ? `${product.quantity} in stock` : "Out of stock"}

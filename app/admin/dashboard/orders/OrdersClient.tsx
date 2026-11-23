@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { updateOrderStatus } from "@/server/actions/adminOrders";
 import { ShoppingCart, ChevronDown } from "lucide-react";
+import { formatMoney } from "@/server/lib/money";
 
 type Order = {
   id: number;
@@ -125,10 +126,10 @@ export default function OrdersClient({ orders }: { orders: Order[] }) {
                     <td>{order.productColor || <span className="text-slate-400">—</span>}</td>
                     <td>{order.quantity}</td>
                     <td className="font-semibold text-slate-800">
-                      USD {order.totalPrice.toFixed(2)}
+                      {formatMoney(order.totalPrice)}
                       {order.discountAmount > 0 && (
                         <span className="ml-1 text-xs text-green-600">
-                          −USD {order.discountAmount.toFixed(2)}
+                          −{formatMoney(order.discountAmount)}
                         </span>
                       )}
                     </td>

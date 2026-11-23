@@ -19,7 +19,7 @@ function validateProduct(input: Partial<ProductInput>, partial = false) {
   const required = ["name", "price", "quantity", "description", "image", "category", "colors", "featured", "bestseller"] as const;
   if (!partial && required.some((key) => input[key] === undefined)) throw new Error("All required product fields must be provided");
   if (input.name !== undefined && (typeof input.name !== "string" || !input.name.trim() || input.name.trim().length > 255)) throw new Error("Product name must be 1–255 characters");
-  if (input.price !== undefined && (!Number.isSafeInteger(input.price) || input.price < 0 || input.price > DB_INTEGER_MAX)) throw new Error("Price must be a valid non-negative whole USD amount");
+  if (input.price !== undefined && (!Number.isSafeInteger(input.price) || input.price < 0 || input.price > DB_INTEGER_MAX)) throw new Error("Price must be a valid non-negative whole JMD amount");
   if (input.quantity !== undefined && (!Number.isSafeInteger(input.quantity) || input.quantity < 0 || input.quantity > DB_INTEGER_MAX)) throw new Error("Quantity must be a valid non-negative whole number");
   for (const [key, max] of [["description", 255], ["imageAlt", 255], ["category", 255]] as const) {
     const value = input[key];
@@ -117,7 +117,7 @@ export async function updateProduct(id: number, input: Partial<ProductInput>) {
   const [product] = await db.update(products).set({ ...input, ...(input.name !== undefined ? { name: input.name.trim() } : {}), ...(input.category !== undefined ? { category: input.category.trim() } : {}), ...(input.image !== undefined ? { image: input.image.trim() } : {}), ...(input.colors !== undefined ? { colors: input.colors.map((color) => color.trim()) } : {}) }).where(eq(products.id, id)).returning();
   if (!product) throw new Error("Product not found");
   const changes: string[] = [];
-  if (input.price !== undefined && input.price !== before.price) changes.push(`price USD ${before.price} → ${input.price}`);
+  if (input.price !== undefined && input.price !== before.price) changes.push(`price JMD ${before.price} → ${input.price}`);
   if (input.quantity !== undefined && input.quantity !== before.quantity) changes.push(`stock ${before.quantity} → ${input.quantity}`);
   if (input.name !== undefined && input.name.trim() !== before.name) changes.push("name changed");
   if (input.category !== undefined && input.category.trim() !== before.category) changes.push("category changed");

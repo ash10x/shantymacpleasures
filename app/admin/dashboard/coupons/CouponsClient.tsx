@@ -109,12 +109,12 @@ export default function CouponsClient({ coupons }: { coupons: Coupon[] }) {
             </div>
             <div>
               <label className="admin-kicker mb-1 block">
-                {form.type === "percent" ? "Discount %" : "Discount amount (cents)"}
+                {form.type === "percent" ? "Discount %" : "Discount amount (JMD cents)"}
               </label>
               <input type="number" className="admin-field" value={form.amount} min={1} max={form.type === "percent" ? 100 : undefined} onChange={(e) => setForm({ ...form, amount: Number(e.target.value) })} required />
             </div>
             <div>
-              <label className="admin-kicker mb-1 block">Min order (cents, 0 = no min)</label>
+              <label className="admin-kicker mb-1 block">Minimum order (JMD cents, 0 = no minimum)</label>
               <input type="number" className="admin-field" value={form.minOrder} min={0} onChange={(e) => setForm({ ...form, minOrder: Number(e.target.value) })} />
             </div>
             <div>
@@ -163,9 +163,9 @@ export default function CouponsClient({ coupons }: { coupons: Coupon[] }) {
                     <td>
                       {c.type === "percent"
                         ? `${c.amount}%`
-                        : `$${(c.amount / 100).toFixed(2)}`}
+                        : `JMD ${(c.amount / 100).toFixed(2)}`}
                     </td>
-                    <td>{c.minOrder > 0 ? `$${(c.minOrder / 100).toFixed(2)}` : "—"}</td>
+                    <td>{c.minOrder > 0 ? `JMD ${(c.minOrder / 100).toFixed(2)}` : "—"}</td>
                     <td>{c.uses}{c.maxUses !== null ? ` / ${c.maxUses}` : ""}</td>
                     <td className="text-xs text-slate-500">
                       {c.expiresAt ? new Date(c.expiresAt).toLocaleDateString() : "Never"}
